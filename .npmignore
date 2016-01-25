@@ -1,0 +1,4 @@
+.eslintrc
+.travis.yml
+src
+test.js
