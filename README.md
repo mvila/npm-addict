@@ -1,19 +1,3 @@
-# ObjectLayer [![Build Status](https://travis-ci.org/object-layer/object-layer.svg?branch=master)](https://travis-ci.org/object-layer/object-layer)
+# 1Place npm integration
 
-Modern ORM for any database.
-
-## Installation
-
-```
-npm install --save object-layer
-```
-
-## Usage
-
-```javascript
-// TODO: Documentation! In the meantime, have a look to test.js.
-```
-
-## License
-
-MIT
+npm integration for 1Place.
