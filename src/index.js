@@ -21,19 +21,53 @@ class Package extends Model {
   @field(String) description;
   @field(String) npmURL;
   @field(String) gitHubURL;
-  @field(Date) visibleOn;
+  @field(Boolean) visible;
   @field(Date, { validators: 'filled' }) createdOn;
   @field(Date, { validators: 'filled' }) updatedOn;
   @field(Object) npmResult;
   @field(Object) gitHubResult;
   @createdOn() itemCreatedOn;
   @updatedOn() itemUpdatedOn;
+
+  determineVisibility(log) {
+    let promote = this.getPromoteProperty();
+    if (promote === false) {
+      if (log) {
+        log.info(`'${this.name}' package has a promote property set to false`);
+      }
+      return false;
+    }
+    if (!promote) {
+      let gitHubStars = this.getGitHubStars();
+      if (gitHubStars == null) return false;
+      if (gitHubStars < 3) {
+        if (log) {
+          log.info(`'${this.name}' package has not enough stars (${gitHubStars}<3)`);
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
+  getPromoteProperty() {
+    let pkg = this.npmResult;
+    let latestVersion = pkg['dist-tags'] && pkg['dist-tags'].latest;
+    if (!latestVersion) return undefined;
+    pkg = pkg.versions && pkg.versions[latestVersion];
+    if (!pkg) return undefined;
+    return pkg.promote;
+  }
+
+  getGitHubStars() {
+    return this.gitHubResult && this.gitHubResult.stargazers_count;
+  }
 }
 
 class Store extends LocalStore {
   @model(AppState) AppState;
   @model(Package, {
-    indexes: ['name', 'visibleOn']
+    indexes: ['name', ['visible', 'itemCreatedOn']]
   }) Package;
 }
 
@@ -110,24 +144,19 @@ class Application extends EventEmitterMixin() {
     for (let name of packages) {
       let pkg = await this.fetchPackage(name);
       if (!pkg) continue;
-      let packages = this.store.Package.find({ query: { name }, limit: 1 });
-      let isNew;
-      let item = packages[0];
-      if (!item) {
-        item = new this.store.Package();
-        isNew = true;
-      }
+      let packages = await this.store.Package.find({ query: { name }, limit: 1 });
+      let item = packages[0] || new this.store.Package();
       Object.assign(item, pkg);
-      if (pkg.visible) {
-        if (!item.visibleOn) item.visibleOn = new Date();
-      } else {
-        if (item.visibleOn) { // eslint-disable-line no-lonely-if
-          this.log.info(`'${name}' package became invisible`);
-          item.visibleOn = undefined;
+      let visible = item.determineVisibility(this.log);
+      if (item.isNew && !visible) continue;
+      if (visible !== item.visible) {
+        if (!item.isNew) {
+          this.log.info(`'${name}' package visibility changed to ${visible ? 'visible' : 'invisible'}`);
         }
+        item.visible = visible;
       }
       await item.save();
-      this.log.info(`'${name}' package ${isNew ? 'created' : 'updated'} (${pkg.visible ? 'visible' : 'invisible'})`);
+      this.log.info(`'${name}' package ${item.isNew ? 'created' : 'updated'}`);
     }
   }
 
@@ -157,13 +186,11 @@ class Application extends EventEmitterMixin() {
       } else {
         this.log.notice(`'${name}' package doesn't have a Git respository`);
       }
-      let visible = this.checkVisibility(name, npmResult, gitHubResult);
       let pkg = {
         name: npmResult.name,
         description: npmResult.description,
         npmURL,
         gitHubURL: parsedGitHubURL && parsedGitHubURL.https_url,
-        visible,
         createdOn: npmResult.time && npmResult.time.created && new Date(npmResult.time.created),
         updatedOn: npmResult.time && npmResult.time.modified && new Date(npmResult.time.modified),
         npmResult,
@@ -174,29 +201,6 @@ class Application extends EventEmitterMixin() {
       this.log.warning(`An error occured while fetching '${name}' package from npm registry (${err.message})`);
       return undefined;
     }
-  }
-
-  checkVisibility(name, npmResult, gitHubResult) {
-    let promote = this.getPromoteProperty(npmResult);
-    if (promote === false) return false;
-    if (!promote) {
-      if (!gitHubResult) return false;
-      let gitHubStars = gitHubResult.stargazers_count;
-      if (gitHubStars == null) return false;
-      if (gitHubStars < 3) {
-        this.log.info(`'${name}' package has not enough stars (${gitHubStars}<3)`);
-        return false;
-      }
-    }
-    return true;
-  }
-
-  getPromoteProperty(data) {
-    let latestVersion = data['dist-tags'] && data['dist-tags'].latest;
-    if (!latestVersion) return undefined;
-    data = data.versions && data.versions[latestVersion];
-    if (!data) return undefined;
-    return data.promote;
   }
 
   async fetchGitHubRepository({ user, repo }) {
