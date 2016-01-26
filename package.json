@@ -4,6 +4,7 @@
   "description": "npm integration for 1Place",
   "author": "Manuel Vila <mvila@3base.com>",
   "license": "MIT",
+  "private": true,
   "main": "lib/index.js",
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "github-url-to-object": "^2.1.0",
     "isomorphic-fetch": "^2.2.1",
     "object-layer": "^0.4.1",
+    "sleep-promise": "^1.0.0",
     "universal-log": "^0.3.4"
   },
   "devDependencies": {
