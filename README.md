@@ -1,3 +1,3 @@
-# 1Place npm integration
+# npm addict
 
-npm integration for 1Place.
+Track newly created npm packages.

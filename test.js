@@ -2,7 +2,7 @@
 
 import { assert } from 'chai';
 
-describe('OnePlaceIntegrationNPM', function() {
+describe('npm addict', function() {
   it('...', function() {
 
   });

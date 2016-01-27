@@ -1,14 +1,14 @@
 {
-  "name": "1place-integration-npm",
+  "name": "npm-addict",
   "version": "0.1.0",
-  "description": "npm integration for 1Place",
+  "description": "Track newly created npm packages",
   "author": "Manuel Vila <mvila@3base.com>",
   "license": "MIT",
   "private": true,
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/kinda/1place-integration-npm"
+    "url": "git://github.com/mvila/npm-addict"
   },
   "scripts": {
     "compile": "babel src --out-dir lib",
