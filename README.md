@@ -1,3 +1,3 @@
 # npm addict
 
-Track newly created npm packages.
+Your daily injection of new npm packages.

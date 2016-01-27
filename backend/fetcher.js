@@ -1,99 +1,17 @@
 'use strict';
 
-import EventEmitterMixin from 'event-emitter-mixin';
-import UniversalLog from 'universal-log';
 import fetch from 'isomorphic-fetch';
 import sleep from 'sleep-promise';
 import parseGitHubURL from 'github-url-to-object';
-import { LocalStore, model, Model, primaryKey, field, createdOn, updatedOn } from 'object-layer';
-let pkg = require('../package.json');
 
 const FETCH_TIMEOUT = 3 * 60 * 1000; // 3 minutes
 
-class BackendState extends Model {
-  @primaryKey(String, { defaultValue: 'BackendState' }) id;
-  @field(Date, {
-    defaultValue: () => new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours
-  }) minimumCreationDate;
-  @field(Date, {
-    defaultValue: () => new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours
-  }) lastModificationDate;
-}
-
-class Package extends Model {
-  @primaryKey() id;
-  @field(String, { validators: 'filled' }) name;
-  @field(String) description;
-  @field(String) npmURL;
-  @field(String) gitHubURL;
-  @field(Boolean) visible;
-  @field(Date, { validators: 'filled' }) createdOn;
-  @field(Date, { validators: 'filled' }) updatedOn;
-  @field(Object) npmResult;
-  @field(Object) gitHubResult;
-  @createdOn() itemCreatedOn;
-  @updatedOn() itemUpdatedOn;
-
-  determineVisibility(log) {
-    let promote = this.getPromoteProperty();
-    if (promote != null) {
-      if (log) {
-        log.notice(`'${this.name}' package has a promote property set to ${promote ? 'true' : 'false'}`);
-      }
-      return promote;
-    }
-    let gitHubStars = this.getGitHubStars();
-    if (gitHubStars == null) return false;
-    if (gitHubStars >= 3) return true;
-    if (log) {
-      log.info(`'${this.name}' package has not enough stars (${gitHubStars} of 3)`);
-    }
-    return false;
-  }
-
-  getPromoteProperty() {
-    let pkg = this.npmResult;
-    let latestVersion = pkg['dist-tags'] && pkg['dist-tags'].latest;
-    if (!latestVersion) return undefined;
-    pkg = pkg.versions && pkg.versions[latestVersion];
-    if (!pkg) return undefined;
-    return pkg.promote;
-  }
-
-  getGitHubStars() {
-    return this.gitHubResult && this.gitHubResult.stargazers_count;
-  }
-}
-
-class IgnoredPackage extends Model {
-  @primaryKey() id;
-  @field(String, { validators: 'filled' }) name;
-  @field(String) reason;
-}
-
-class Store extends LocalStore {
-  @model(BackendState) BackendState;
-  @model(Package, {
-    indexes: ['name', ['visible', 'itemCreatedOn']]
-  }) Package;
-  @model(IgnoredPackage, { indexes: ['name'] }) IgnoredPackage;
-}
-
-class Application extends EventEmitterMixin() {
-  constructor({ name, displayName, version } = {}) {
-    super();
-
-    this.name = name || pkg.name;
-    this.displayName = displayName || pkg.displayName || pkg.name;
-    this.version = version || pkg.version;
-
-    this.log = new UniversalLog({ appName: this.name });
-
-    this.store = new Store({
-      context: this,
-      name: 'npmAddict',
-      url: 'mysql://root:secret@localhost/npm_addict'
-    });
+export class Fetcher {
+  constructor({ context } = {}) {
+    this.context = context;
+    this.log = context.log;
+    this.store = context.store;
+    this.state = context.state;
 
     this.npmUpdatedPackagesURL = 'http://registry.npmjs.org/-/_view/browseUpdated?group_level=2';
     this.npmWebsitePackageURL = 'https://www.npmjs.com/package/';
@@ -104,7 +22,6 @@ class Application extends EventEmitterMixin() {
   }
 
   async run() {
-    await this.initialize();
     // await this.fetchPackage('webpack-config-json');
     while (true) {
       let startDate = new Date(this.state.lastModificationDate.valueOf() + 1);
@@ -116,13 +33,6 @@ class Application extends EventEmitterMixin() {
         await this.state.save();
       }
       await sleep(5 * 60 * 1000); // 5 minutes
-    }
-  }
-
-  async initialize() {
-    this.state = await this.store.BackendState.get('BackendState', { errorIfMissing: false });
-    if (!this.state) {
-      this.state = new this.store.BackendState();
     }
   }
 
@@ -260,6 +170,4 @@ class Application extends EventEmitterMixin() {
   }
 }
 
-let app = new Application();
-
-app.run().catch(app.log.error);
+export default Fetcher;
