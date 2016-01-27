@@ -1,4 +1,4 @@
 .eslintrc
 .travis.yml
-src
+artwork
 test.js
