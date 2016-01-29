@@ -2,9 +2,9 @@
 
 let pathModule = require('path');
 let childProcess = require('child_process');
-import AbstractBackendApplication from './abstract-application/backend';
+import BaseBackendApplication from './base-application/backend';
 
-class Application extends AbstractBackendApplication {
+class Application extends BaseBackendApplication {
   constructor(options) {
     super(options);
   }

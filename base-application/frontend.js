@@ -1,8 +1,8 @@
 'use strict';
 
-import AbstractApplication from './';
+import BaseApplication from './';
 
-export class AbstractFrontendApplication extends AbstractApplication {
+export class BaseFrontendApplication extends BaseApplication {
   constructor(options) {
     super(options);
 
@@ -12,4 +12,4 @@ export class AbstractFrontendApplication extends AbstractApplication {
   }
 }
 
-export default AbstractFrontendApplication;
+export default BaseFrontendApplication;

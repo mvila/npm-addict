@@ -22,12 +22,13 @@ export class Fetcher {
   }
 
   async run() {
-    // await this.fetchPackage('webpack-config-json');
     while (true) {
       let startDate = new Date(this.state.lastModificationDate.valueOf() + 1);
       let result = await this.findUpdatedPackages(startDate);
       this.log.notice(`${result.packages.length} updated packages found in npm registry`);
-      await this.updatePackages(result.packages);
+      for (let name of result.packages) {
+        await this.updatePackage(name);
+      }
       if (result.lastDate) {
         this.state.lastModificationDate = result.lastDate;
         await this.state.save();
@@ -59,25 +60,23 @@ export class Fetcher {
     return { packages, lastDate };
   }
 
-  async updatePackages(packages) {
-    for (let name of packages) {
-      let pkg = await this.fetchPackage(name);
-      if (!pkg) continue;
-      let item = await this.store.Package.getByName(name);
-      if (!item) item = new this.store.Package();
-      Object.assign(item, pkg);
-      let visible = item.determineVisibility(this.log);
-      if (item.isNew && !visible) continue;
-      if (visible !== item.visible) {
-        if (!item.isNew) {
-          this.log.info(`'${name}' package visibility changed to ${visible ? 'visible' : 'invisible'}`);
-        }
-        item.visible = visible;
+  async updatePackage(name) {
+    let pkg = await this.fetchPackage(name);
+    if (!pkg) return;
+    let item = await this.store.Package.getByName(name);
+    if (!item) item = new this.store.Package();
+    Object.assign(item, pkg);
+    let visible = item.determineVisibility(this.log);
+    if (item.isNew && !visible) return;
+    if (visible !== item.visible) {
+      if (!item.isNew) {
+        this.log.info(`'${name}' package visibility changed to ${visible ? 'visible' : 'invisible'}`);
       }
-      let wasNew = item.isNew;
-      await item.save();
-      this.log.info(`'${name}' package ${wasNew ? 'created' : 'updated'}`);
+      item.visible = visible;
     }
+    let wasNew = item.isNew;
+    await item.save();
+    this.log.info(`'${name}' package ${wasNew ? 'created' : 'updated'}`);
   }
 
   async fetchPackage(name) {
@@ -131,6 +130,11 @@ export class Fetcher {
         this.log.debug(`'${name}' package doesn't have a Git respository`);
       }
 
+      let gitHubPackageJSON;
+      if (gitHubResult) {
+        gitHubPackageJSON = await this.getGitHubPackageJSON(parsedGitHubURL);
+      }
+
       return {
         name: npmResult.name,
         description: npmResult.description,
@@ -139,7 +143,8 @@ export class Fetcher {
         createdOn,
         updatedOn,
         npmResult,
-        gitHubResult
+        gitHubResult,
+        gitHubPackageJSON
       };
     } catch (err) {
       this.log.warning(`An error occured while fetching '${name}' package from npm registry (${err.message})`);
@@ -150,23 +155,45 @@ export class Fetcher {
   async fetchGitHubRepository({ user, repo }) {
     try {
       let url = `${this.gitHubAPIURL}repos/${user}/${repo}`;
-      let auth = this.gitHubUsername + ':' + this.gitHubPersonalAccessToken;
-      auth = new Buffer(auth).toString('base64');
-      let response = await fetch(url, {
-        headers: {
-          Authorization: 'Basic ' + auth
-        },
-        timeout: FETCH_TIMEOUT
-      });
-      if (response.status !== 200) {
-        this.log.warning(`Bad response from GitHub API while fetching '${user}/${repo}' repository (HTTP status: ${response.status})`);
-        return undefined;
-      }
-      return await response.json();
+      return await this.requestGitHubAPI(url);
     } catch (err) {
       this.log.warning(`An error occured while fetching '${user}/${repo}' repository from GitHub API (${err.message})`);
       return undefined;
     }
+  }
+
+  async getGitHubPackageJSON({ user, repo }) {
+    try {
+      let url = `${this.gitHubAPIURL}repos/${user}/${repo}/contents/package.json`;
+      let file = await this.requestGitHubAPI(url);
+      if (!file) return false;
+      if (file.encoding !== 'base64') {
+        throw new Error('Unsupported GitHub file encoding');
+      }
+      let json = file.content;
+      json = new Buffer(json, 'base64').toString();
+      let pkg = JSON.parse(json);
+      return pkg;
+    } catch (err) {
+      this.log.warning(`An error occured while fetching package.json file from '${user}/${repo}' GitHub repository (${err.message})`);
+      return undefined;
+    }
+  }
+
+  async requestGitHubAPI(url) {
+    let auth = this.gitHubUsername + ':' + this.gitHubPersonalAccessToken;
+    auth = new Buffer(auth).toString('base64');
+    let response = await fetch(url, {
+      headers: {
+        Authorization: 'Basic ' + auth
+      },
+      timeout: FETCH_TIMEOUT
+    });
+    if (response.status !== 200) {
+      this.log.warning(`Bad response from GitHub API while requesting '${url}' URL (HTTP status: ${response.status})`);
+      return undefined;
+    }
+    return await response.json();
   }
 }
 

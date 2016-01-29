@@ -1,11 +1,11 @@
 'use strict';
 
 let pathModule = require('path');
-import AbstractBackendApplication from '../abstract-application/backend';
+import BaseBackendApplication from '../base-application/backend';
 import builder from '../builder';
 import server from '../server';
 
-class Application extends AbstractBackendApplication {
+class Application extends BaseBackendApplication {
   constructor(options) {
     super(options);
 

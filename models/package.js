@@ -13,6 +13,7 @@ export class Package extends Model {
   @field(Date, { validators: 'filled' }) updatedOn;
   @field(Object) npmResult;
   @field(Object) gitHubResult;
+  @field(Object) gitHubPackageJSON;
   @createdOn() itemCreatedOn;
   @updatedOn() itemUpdatedOn;
 
@@ -28,6 +29,7 @@ export class Package extends Model {
       }
       return false;
     }
+
     let promote = this.getPromoteProperty();
     if (promote != null) {
       if (log) {
@@ -35,12 +37,22 @@ export class Package extends Model {
       }
       return promote;
     }
+
+    let verification = this.verifyGitHubRepositoryOwnership();
+    if (verification === false) {
+      if (log) {
+        log.info(`'${this.name}' package has a GitHub repository but the ownership verification failed`);
+      }
+      return false;
+    }
+
     let gitHubStars = this.getGitHubStars();
     if (gitHubStars == null) return false;
     if (gitHubStars >= 3) return true;
     if (log) {
       log.info(`'${this.name}' package has not enough stars (${gitHubStars} of 3)`);
     }
+
     return false;
   }
 
@@ -55,6 +67,12 @@ export class Package extends Model {
 
   getGitHubStars() {
     return this.gitHubResult && this.gitHubResult.stargazers_count;
+  }
+
+  verifyGitHubRepositoryOwnership() {
+    if (!this.gitHubResult) return undefined;
+    if (!this.gitHubPackageJSON) return false;
+    return this.gitHubPackageJSON.name === this.name;
   }
 }
 

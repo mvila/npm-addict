@@ -1,11 +1,12 @@
 'use strict';
 
-import AbstractBackendApplication from '../abstract-application/backend';
+import util from 'util';
+import BaseBackendApplication from '../base-application/backend';
 import Store from './store';
 import Fetcher from './fetcher';
 import server from './server';
 
-class Application extends AbstractBackendApplication {
+class Application extends BaseBackendApplication {
   constructor(options) {
     super(options);
 
@@ -39,14 +40,51 @@ class Application extends AbstractBackendApplication {
 
     let command = this.argv._[0];
     if (!command) throw new Error('Command is missing');
+    let name;
     switch (command) {
       case 'start':
         result = await this.start();
         break;
+      case 'show':
+        name = this.argv._[1];
+        if (name) {
+          result = await this.show(name);
+        } else if (this.argv.invisible) {
+          result = await this.showInvisible();
+        } else if (this.argv.ignored) {
+          result = await this.showIgnored();
+        } else {
+          throw new Error('A parameter is missing');
+        }
+        break;
+      case 'delete':
+        name = this.argv._[1];
+        if (name) {
+          result = await this.delete(name);
+        } else if (this.argv.invisible) {
+          result = await this.deleteInvisible();
+        } else {
+          throw new Error('A parameter is missing');
+        }
+        break;
       case 'ignore':
-        let name = this.argv._[1];
+        name = this.argv._[1];
         if (!name) throw new Error('Package name is missing');
         result = await this.ignore(name);
+        break;
+      case 'verify':
+        name = this.argv._[1];
+        if (!name) throw new Error('Package name is missing');
+        result = await this.verify(name);
+        break;
+      case 'update':
+        name = this.argv._[1];
+        if (name) {
+          result = await this.update(name);
+        } else {
+          if (!this.argv.all) throw new Error('Package name or --all option is missing');
+          result = await this.updateAll();
+        }
         break;
       default:
         throw new Error(`Unknown command '${command}'`);
@@ -62,6 +100,8 @@ class Application extends AbstractBackendApplication {
     if (!this.state) {
       this.state = new this.store.BackendState();
     }
+
+    this.fetcher = new Fetcher({ context: this });
   }
 
   async close() {
@@ -69,7 +109,6 @@ class Application extends AbstractBackendApplication {
   }
 
   async start() {
-    this.fetcher = new Fetcher({ context: this });
     this.fetcher.run().catch(err => {
       this.log.error(err);
       this.log.emergency('Fetcher crashed');
@@ -81,22 +120,88 @@ class Application extends AbstractBackendApplication {
     return 'KEEP_ALIVE';
   }
 
+  async show(name) {
+    let pkg = await this.store.Package.getByName(name);
+    if (!pkg) {
+      console.error(`'${name}' package not found in the database`);
+    }
+    pkg = pkg.toJSON();
+    console.log(util.inspect(pkg, { depth: null, colors: true }));
+  }
+
+  async showInvisible() {
+    let packages = await this.store.Package.find({
+      query: { visible: false },
+      order: 'itemCreatedOn'
+    });
+    for (let pkg of packages) {
+      console.log(pkg.name);
+    }
+  }
+
+  async showIgnored() {
+    let packages = await this.store.IgnoredPackage.find({ order: 'name' });
+    for (let pkg of packages) {
+      console.log(`${pkg.name} (${pkg.reason})`);
+    }
+  }
+
+  async delete(name) {
+    let pkg = await this.store.Package.getByName(name);
+    if (pkg) {
+      await pkg.delete();
+      console.log(`'${name}' Package item deleted`);
+    }
+    let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
+    if (ignoredPackage) {
+      await ignoredPackage.delete();
+      console.log(`'${name}' IgnoredPackage item deleted`);
+    }
+  }
+
+  async deleteInvisible() {
+    throw new Error('This command should not be used anymore');
+    // let packages = await this.store.Package.find({ query: { visible: false }, order: 'itemCreatedOn' });
+    // for (let pkg of packages) {
+    //   await this.delete(pkg.name);
+    // }
+  }
+
   async ignore(name) {
     let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
     if (ignoredPackage) {
-      this.log.warning(`'${name}' package has already been ignored`);
+      console.error(`'${name}' package has already been ignored`);
       return;
     }
     let pkg = await this.store.Package.getByName(name);
     if (pkg) {
       await pkg.delete();
-      this.log.info(`'${name}' package deleted`);
+      console.log(`'${name}' package deleted`);
     }
     await this.store.IgnoredPackage.put({
       name,
       reason: 'MANUALLY_IGNORED'
     });
-    this.log.info(`'${name}' package has been manually marked as ignored`);
+    console.log(`'${name}' package has been manually marked as ignored`);
+  }
+
+  async verify(name) {
+    let pkg = await this.fetcher.fetchPackage(name);
+    if (!pkg) return;
+    let item = new this.store.Package(pkg);
+    let visible = item.determineVisibility(this.log);
+    console.log(`'${name}' package visibility is: ${visible}`);
+  }
+
+  async update(name) {
+    await this.fetcher.updatePackage(name);
+  }
+
+  async updateAll() {
+    let packages = await this.store.Package.find();
+    for (let pkg of packages) {
+      await this.fetcher.updatePackage(pkg.name);
+    }
   }
 }
 

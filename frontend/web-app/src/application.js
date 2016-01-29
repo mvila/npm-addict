@@ -4,12 +4,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Style } from 'radium';
 import fetch from 'isomorphic-fetch';
-import sleep from 'sleep-promise';
-import FrontendApplication from '../../../abstract-application/frontend';
+import BaseFrontendApplication from '../../../base-application/frontend';
 import styles from './styles';
 import Page from './components/page';
 
-class App extends FrontendApplication {
+class Application extends BaseFrontendApplication {
   constructor(options) {
     super(options);
     this.url = this.frontendURL;
@@ -60,6 +59,6 @@ class App extends FrontendApplication {
   }
 }
 
-let app = new App({ name: 'npm-addict-frontend' });
+let app = new Application({ name: 'npm-addict-frontend' });
 
 app.run().catch(app.log.error);

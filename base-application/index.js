@@ -6,7 +6,7 @@ import UniversalLog from 'universal-log';
 import EasyNotifier from 'easy-notifier';
 let pkg = require('../package.json');
 
-export class AbstractApplication extends EventEmitterMixin() {
+export class BaseApplication extends EventEmitterMixin() {
   constructor({ name, displayName, version } = {}) {
     super();
 
@@ -39,4 +39,4 @@ export class AbstractApplication extends EventEmitterMixin() {
   }
 }
 
-export default AbstractApplication;
+export default BaseApplication;

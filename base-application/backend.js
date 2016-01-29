@@ -2,9 +2,9 @@
 
 let argv = require('minimist')(process.argv.slice(2));
 import sleep from 'sleep-promise';
-import AbstractApplication from './';
+import BaseApplication from './';
 
-export class AbstractBackendApplication extends AbstractApplication {
+export class BaseBackendApplication extends BaseApplication {
   constructor(options) {
     super(options);
 
@@ -27,4 +27,4 @@ export class AbstractBackendApplication extends AbstractApplication {
   }
 }
 
-export default AbstractBackendApplication;
+export default BaseBackendApplication;
