@@ -18,7 +18,10 @@ export class Fetcher {
     this.npmAPIPackageURL = 'http://registry.npmjs.org/';
     this.gitHubAPIURL = 'https://api.github.com/';
     this.gitHubUsername = 'mvila';
-    this.gitHubPersonalAccessToken = '5169f297fa7d627c4b1b5bf1f0e345dbff117198';
+    if (!process.env.GITHUB_PERSONAL_ACCESS_TOKEN) {
+      throw new Error('GITHUB_PERSONAL_ACCESS_TOKEN environment variable is missing');
+    }
+    this.gitHubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
   }
 
   async run() {

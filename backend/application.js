@@ -10,10 +10,13 @@ class Application extends BaseBackendApplication {
   constructor(options) {
     super(options);
 
+    if (!process.env.STORE_URL) {
+      throw new Error('STORE_URL environment variable is missing');
+    }
     this.store = new Store({
       context: this,
       name: 'npmAddict',
-      url: 'mysql://root:secret@localhost/npm_addict'
+      url: process.env.STORE_URL
     });
 
     this.url = this.apiURL;
