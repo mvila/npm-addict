@@ -1,6 +1,6 @@
 FROM node:4
 
-ENV NODE_ENV production
+ENV NODE_ENV=production TERM=xterm
 
 RUN apt-get update && apt-get install -y \
   nano
