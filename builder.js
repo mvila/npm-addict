@@ -58,6 +58,10 @@ async function build(app, options = {}) {
     }
   }
 
+  async function checkEnvironment() {
+    app.log.info('checkEnvironment: ' + app.environment);
+  }
+
   async function getBuildNumber() {
     buildNumber = Date.now();
     app.log.info('getBuildNumber: ' + buildNumber);
@@ -159,15 +163,16 @@ async function build(app, options = {}) {
     let scriptPaths = vendorScriptPaths.map(path => {
       return pathModule.join(sourceDir, vendorDirname, path);
     });
-    let output;
-    if (app.environment === 'development') {
-      output = '';
-      scriptPaths.forEach(path => {
-        output += fs.readFileSync(path, 'utf8');
-      });
-    } else {
-      let result = UglifyJS.minify(scriptPaths);
-      output = result.code;
+    let output = '';
+    if (scriptPaths.length) {
+      if (app.environment === 'development') {
+        scriptPaths.forEach(path => {
+          output += fs.readFileSync(path, 'utf8');
+        });
+      } else {
+        let result = UglifyJS.minify(scriptPaths);
+        output += result.code;
+      }
     }
     let outputDir = pathModule.join(targetDir, scriptsDirname);
     mkdirp.sync(outputDir);
@@ -271,6 +276,7 @@ async function build(app, options = {}) {
   }
 
   async function buildAll() {
+    await checkEnvironment();
     await getBuildNumber();
     await buildCSS();
     await copyStaticFiles();
