@@ -63,8 +63,8 @@ export class Fetcher {
     for (let name of packages) {
       let pkg = await this.fetchPackage(name);
       if (!pkg) continue;
-      let packages = await this.store.Package.find({ query: { name }, limit: 1 });
-      let item = packages[0] || new this.store.Package();
+      let item = await this.store.Package.getByName(name);
+      if (!item) item = new this.store.Package();
       Object.assign(item, pkg);
       let visible = item.determineVisibility(this.log);
       if (item.isNew && !visible) continue;
@@ -82,8 +82,8 @@ export class Fetcher {
 
   async fetchPackage(name) {
     try {
-      let packages = await this.store.IgnoredPackage.find({ query: { name }, limit: 1 });
-      if (packages.length) {
+      let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
+      if (ignoredPackage) {
         this.log.debug(`'${name}' package ignored`);
         return undefined;
       }

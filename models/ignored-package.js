@@ -8,6 +8,11 @@ export class IgnoredPackage extends Model {
   @field(String) reason;
   @createdOn() createdOn;
   @updatedOn() updatedOn;
+
+  static async getByName(name) {
+    let ignoredPackages = await this.find({ query: { name }, limit: 1 });
+    return ignoredPackages[0];
+  }
 }
 
 export default IgnoredPackage;

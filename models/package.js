@@ -16,6 +16,11 @@ export class Package extends Model {
   @createdOn() itemCreatedOn;
   @updatedOn() itemUpdatedOn;
 
+  static async getByName(name) {
+    let packages = await this.find({ query: { name }, limit: 1 });
+    return packages[0];
+  }
+
   determineVisibility(log) {
     if (!this.description) {
       if (log) {
