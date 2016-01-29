@@ -4,7 +4,7 @@ import Radium from 'radium';
 import React from 'react';
 import s from '../styles';
 import Header from './header';
-import Footer from './Footer';
+import Footer from './footer';
 import NewPackages from './new-packages';
 import FAQ from './faq';
 
