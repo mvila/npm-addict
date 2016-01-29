@@ -1,7 +1,8 @@
 'use strict';
 
 let koa = require('koa');
-let serve = require('koa-static');
+let rewrite = require('koa-rewrite');
+let staticCache = require('koa-static-cache');
 let gzip = require('koa-gzip');
 
 function start(app, options = {}) {
@@ -22,7 +23,8 @@ function start(app, options = {}) {
   root.use(app.log.getLoggerMiddleware());
   root.use(ping());
   root.use(gzip());
-  root.use(serve(options.path, { format: true }));
+  root.use(rewrite('/', '/index.html'));
+  root.use(staticCache(options.path, { dynamic: true }));
 
   root.listen(options.port, function() {
     app.log.info('Listening on port ' + options.port);

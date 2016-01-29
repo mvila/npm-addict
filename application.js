@@ -49,8 +49,8 @@ class Application extends AbstractBackendApplication {
     path = pathModule.join(__dirname, 'backend', 'index.js');
     this.spawn(node, path, 'start');
 
-    // path = pathModule.join(__dirname, 'frontend', 'index.js');
-    // this.spawn(node, path, 'start');
+    path = pathModule.join(__dirname, 'frontend', 'index.js');
+    this.spawn(node, path, 'start');
   }
 
   spawn(cmd, ...args) {

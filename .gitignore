@@ -3,3 +3,4 @@ node_modules
 lib
 notes.js
 data
+frontend/web-app/dist

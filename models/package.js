@@ -17,6 +17,12 @@ export class Package extends Model {
   @updatedOn() itemUpdatedOn;
 
   determineVisibility(log) {
+    if (!this.description) {
+      if (log) {
+        log.info(`'${this.name}' package doesn't have a description`);
+      }
+      return false;
+    }
     let promote = this.getPromoteProperty();
     if (promote != null) {
       if (log) {

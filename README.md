@@ -1,3 +1,3 @@
 # npm addict
 
-Your daily injection of new npm packages.
+Your daily injection of npm packages.

@@ -182,10 +182,11 @@ async function build(app, options = {}) {
     let inputPath = pathModule.join(inputDir, appScriptFilename);
     let opts = watchMode ? watchify.args : {};
     // if (app.environment === 'development') opts.debug = true;
+    if (app.environment === 'development') opts.fullPaths = true;
     let bro = browserify(opts);
     bro.transform(babelify, {
       presets: ['es2015', 'react'],
-      plugins: ['transform-decorators-legacy']
+      plugins: ['transform-decorators-legacy', 'transform-class-properties']
     });
     bro.require(inputPath, { entry: true });
     if (watchMode) bro = watchify(bro, { poll: 1000 });
@@ -199,6 +200,9 @@ async function build(app, options = {}) {
     }
     async function bundle() {
       let output = await _bundle();
+      if (app.environment !== 'development') {
+        output = (UglifyJS.minify(output.toString(), { fromString: true })).code;
+      }
       let outputDir = pathModule.join(targetDir, scriptsDirname);
       let outputPath = pathModule.join(outputDir, browserifiedAppScriptFilename);
       fs.writeFileSync(outputPath, output);

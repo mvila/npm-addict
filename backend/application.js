@@ -3,6 +3,7 @@
 import AbstractBackendApplication from '../abstract-application/backend';
 import Store from './store';
 import Fetcher from './fetcher';
+import server from './server';
 
 class Application extends AbstractBackendApplication {
   constructor(options) {
@@ -13,6 +14,22 @@ class Application extends AbstractBackendApplication {
       name: 'npmAddict',
       url: 'mysql://root:secret@localhost/npm_addict'
     });
+
+    this.url = this.apiURL;
+
+    switch (this.environment) {
+      case 'development':
+        this.port = 8811;
+        break;
+      case 'test':
+        this.port = 8821;
+        break;
+      case 'production':
+        this.port = 8831;
+        break;
+      default:
+        throw new Error(`Unknown environment ('${this.environment}')`);
+    }
   }
 
   async run() {
@@ -36,6 +53,8 @@ class Application extends AbstractBackendApplication {
       this.log.emergency('Fetcher crashed');
       this.notifier.notify(`Fetcher crashed (${err.message})`);
     });
+
+    server.start(this, { port: this.port });
   }
 
   async initialize() {
