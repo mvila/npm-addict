@@ -11,7 +11,8 @@ export class Header extends React.Component {
     return (
       <header style={[s.flex, s.flexCenter, s.pl15, s.pr2, s.py15, s.borderBottom]}>
         <a href='#/' style={{ lineHeight: 0 }}>
-          <img src='images/npm-addict-logo-and-tagline.svg' alt='npm addict - Your daily injection of npm packages' />
+          <img src='images/npm-addict-logo-and-tagline.svg' alt='npm addict - Your daily injection of npm packages' style={[s.smShow]} />
+          <img src='images/npm-addict-logo.svg' alt='npm addict' style={[s.smHide]} />
         </a>
         <div style={s.flexAuto} />
         <MainMenu />

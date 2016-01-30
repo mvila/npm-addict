@@ -21,11 +21,11 @@ export class PackageList extends React.Component {
     }
 
     return (
-      <div>
-        <div style={[s.inlineBlock, s.mt05, s.mb05, s.px075, s.py05, s.fs5, s.caps, s.bold, s.white, s.bgGray, { lineHeight: 1 }]}>
+      <div style={[s.mt225, s.mb25]}>
+        <div style={[s.inlineBlock, s.mb05, s.px075, s.py05, s.fs5, s.caps, s.bold, s.white, s.bgGray, { lineHeight: 1 }]}>
           {displayDate}
         </div>
-        <ul style={[s.listReset, s.mb25]}>
+        <ul style={[s.listReset]}>
           {
             items.map(item => <PackageItem key={item.id} item={item} />)
           }

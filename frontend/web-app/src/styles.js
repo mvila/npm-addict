@@ -72,6 +72,7 @@ s.mt15 = { marginTop: '.75rem' };
 s.mr15 = { marginRight: '.75rem' };
 s.mb15 = { marginBottom: '.75rem' };
 s.ml15 = { marginLeft: '.75rem' };
+s.mt225 = { marginTop: '1.125rem' };
 s.mt25 = { marginTop: '1.25rem' };
 s.mb25 = { marginBottom: '1.25rem' };
 
