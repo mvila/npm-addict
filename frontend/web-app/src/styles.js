@@ -74,7 +74,9 @@ s.mb15 = { marginBottom: '.75rem' };
 s.ml15 = { marginLeft: '.75rem' };
 s.mt225 = { marginTop: '1.125rem' };
 s.mt25 = { marginTop: '1.25rem' };
+s.mr25 = { marginRight: '1.25rem' };
 s.mb25 = { marginBottom: '1.25rem' };
+s.ml25 = { marginLeft: '1.25rem' };
 
 s.px025 = { paddingLeft: '.125rem', paddingRight: '.125rem' };
 s.py025 = { paddingTop: '.125rem', paddingBottom: '.125rem' };

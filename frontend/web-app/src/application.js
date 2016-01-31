@@ -49,7 +49,8 @@ class Application extends BaseFrontendApplication {
         id: pkg.id,
         name: pkg.name,
         description: pkg.description,
-        url: pkg.url,
+        npmURL: pkg.npmURL,
+        gitHubURL: pkg.gitHubURL,
         date: new Date(pkg.date)
       });
     }

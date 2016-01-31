@@ -27,7 +27,8 @@ function start(app, options = {}) {
         id: pkg.id,
         name: pkg.name,
         description: pkg.description,
-        url: pkg.gitHubURL || pkg.npmURL,
+        npmURL: pkg.npmURL,
+        gitHubURL: pkg.gitHubURL,
         date: pkg.itemCreatedOn
       };
     });
