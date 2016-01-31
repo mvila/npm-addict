@@ -21,7 +21,8 @@ async function build(app, options = {}) {
   let sourceDir = options.sourceDir;
   let targetDir = options.targetDir;
   let vendorDirname = options.vendorDirname;
-  let stylesDirname = options.stylesDirname;
+  let inputStylesDirname = options.inputStylesDirname;
+  let outputStylesDirname = options.outputStylesDirname;
   let sassFilename = options.sassFilename;
   let sassDependencyFilenames = options.sassDependencyFilenames;
   let vendorCSSPaths = options.vendorCSSPaths;
@@ -79,7 +80,7 @@ async function build(app, options = {}) {
 
     if (sassFilename) {
       let sass = require('node-sass');
-      let inputDir = pathModule.join(sourceDir, stylesDirname);
+      let inputDir = pathModule.join(sourceDir, inputStylesDirname || '');
       let inputPath = pathModule.join(inputDir, sassFilename);
       output += sass.renderSync({
         file: inputPath,
@@ -87,18 +88,19 @@ async function build(app, options = {}) {
       }).css;
     }
 
-    let outputDir = pathModule.join(targetDir, stylesDirname);
-    mkdirp.sync(outputDir);
-    let outputPath = pathModule.join(outputDir, cssFilename);
-    fs.writeFileSync(outputPath, output);
-
-    addAppCachePath(pathModule.join(stylesDirname, cssFilename));
+    if (output) {
+      let outputDir = pathModule.join(targetDir, outputStylesDirname || '');
+      mkdirp.sync(outputDir);
+      let outputPath = pathModule.join(outputDir, cssFilename);
+      fs.writeFileSync(outputPath, output);
+      addAppCachePath(pathModule.join(outputStylesDirname || '', cssFilename));
+    }
 
     app.log.info('buildCSS: done');
   }
 
   async function watchCSS() {
-    let cssDir = pathModule.join(sourceDir, stylesDirname);
+    let cssDir = pathModule.join(sourceDir, inputStylesDirname || '');
     let filenames = [];
     if (sassFilename) filenames.push(sassFilename);
     filenames = filenames.concat(sassDependencyFilenames);
@@ -174,11 +176,13 @@ async function build(app, options = {}) {
         output += result.code;
       }
     }
-    let outputDir = pathModule.join(targetDir, scriptsDirname);
-    mkdirp.sync(outputDir);
-    let outputPath = pathModule.join(outputDir, vendorScriptFilename);
-    fs.writeFileSync(outputPath, output);
-    addAppCachePath(pathModule.join(scriptsDirname, vendorScriptFilename));
+    if (output) {
+      let outputDir = pathModule.join(targetDir, scriptsDirname || '');
+      mkdirp.sync(outputDir);
+      let outputPath = pathModule.join(outputDir, vendorScriptFilename);
+      fs.writeFileSync(outputPath, output);
+      addAppCachePath(pathModule.join(scriptsDirname || '', vendorScriptFilename));
+    }
     app.log.info('concatVendorScript: done');
   }
 
@@ -208,7 +212,7 @@ async function build(app, options = {}) {
       if (app.environment !== 'development') {
         output = (UglifyJS.minify(output.toString(), { fromString: true })).code;
       }
-      let outputDir = pathModule.join(targetDir, scriptsDirname);
+      let outputDir = pathModule.join(targetDir, scriptsDirname || '');
       let outputPath = pathModule.join(outputDir, browserifiedAppScriptFilename);
       fs.writeFileSync(outputPath, output);
       app.log.info('browserifyAppScript: done');
@@ -227,7 +231,7 @@ async function build(app, options = {}) {
       });
     }
     await bundle();
-    addAppCachePath(pathModule.join(scriptsDirname, browserifiedAppScriptFilename));
+    addAppCachePath(pathModule.join(scriptsDirname || '', browserifiedAppScriptFilename));
   }
 
   async function copyHTMLIndexFiles() {
@@ -276,6 +280,7 @@ async function build(app, options = {}) {
   }
 
   async function buildAll() {
+    mkdirp.sync(targetDir);
     await checkEnvironment();
     await getBuildNumber();
     await buildCSS();

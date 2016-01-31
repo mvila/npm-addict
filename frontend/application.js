@@ -51,11 +51,11 @@ class Application extends BaseBackendApplication {
 
         vendorDirname: 'vendor',
 
-        stylesDirname: 'styles',
+        stylesDirname: undefined, // 'styles'
         sassFilename: undefined,
         sassDependencyFilenames: [],
         vendorCSSPaths: [],
-        cssFilename: 'app.css',
+        cssFilename: 'index.css',
 
         htmlIndexFilenames: ['index.html'],
 
@@ -64,13 +64,14 @@ class Application extends BaseBackendApplication {
           'images'
         ],
 
-        scriptsDirname: 'scripts',
+        inputStylesDirname: undefined, // 'scripts'
+        outputStylesDirname: undefined, // 'scripts'
 
         vendorScriptPaths: [],
         vendorScriptFilename: 'vendor.js',
 
         appScriptFilename: 'index.js',
-        browserifiedAppScriptFilename: 'app.js',
+        browserifiedAppScriptFilename: 'index.js',
 
         appCacheManifestFilename: undefined,
         appCachePaths: [],
