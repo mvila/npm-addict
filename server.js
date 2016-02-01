@@ -20,6 +20,7 @@ function start(app, options = {}) {
 
   let root = koa();
   root.name = app.name;
+  root.proxy = true;
   root.use(app.log.getLoggerMiddleware());
   root.use(ping());
   root.use(gzip());

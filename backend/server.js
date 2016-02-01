@@ -77,6 +77,7 @@ function start(app, options = {}) {
 
   let root = koa();
   root.name = app.name;
+  root.proxy = true;
   root.use(cors());
   root.use(app.log.getLoggerMiddleware());
   root.use(mount('/v1', v1));
