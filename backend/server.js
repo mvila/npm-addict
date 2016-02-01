@@ -20,16 +20,7 @@ function start(app, options = {}) {
       if (trackingId) {
         let userId;
         if (this.query.clientId) userId = 'client-' + this.query.clientId;
-        let options = {
-          ipOverride: this.request.ip,
-          documentHostName: this.hostname,
-          documentPath: this.path,
-          userAgentOverride: this.headers['user-agent'],
-          documentReferrer: this.headers['referer'],
-          userLanguage: this.headers['accept-language'],
-          strictCidFormat: false
-        };
-        this.visitor = ua(trackingId, userId, options);
+        this.visitor = ua(trackingId, userId, { strictCidFormat: false }).debug();
       }
     } catch (err) {
       app.log.notice(`An error occured while creating an Universal Analytics visitor (${err.message})`);
@@ -37,9 +28,20 @@ function start(app, options = {}) {
     yield next;
   }
 
-  function sendUAEvent(visitor, category, action) {
-    if (!visitor) return;
-    visitor.event(category, action, function(err) {
+  function sendUAEvent(ctx, category, action) {
+    if (!ctx.visitor) return;
+    let options = {
+      eventCategory: category,
+      eventAction: action,
+      ipOverride: ctx.request.ip,
+      documentHostName: ctx.hostname,
+      documentPath: ctx.path,
+      userAgentOverride: ctx.headers['user-agent'],
+      documentReferrer: ctx.headers['referer'],
+      userLanguage: ctx.headers['accept-language'],
+      strictCidFormat: false
+    };
+    ctx.visitor.event(options, function(err) {
       if (err) {
         app.log.notice(`An error occured while sending an Universal Analytics event (${err.message})`);
       }
@@ -69,7 +71,7 @@ function start(app, options = {}) {
 
     this.body = results;
 
-    sendUAEvent(this.visitor, 'backend', 'getNewPackages');
+    sendUAEvent(this, 'backend', 'getNewPackages');
   });
 
   // === Server initialization ===
