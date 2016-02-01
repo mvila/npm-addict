@@ -17,7 +17,10 @@ export class BaseApplication extends EventEmitterMixin() {
 
     this.environment = environment;
 
-    this.log = new UniversalLog({ appName: this.name });
+    let options = { appName: this.name, muteLevels: ['silence'] };
+    if (this.environment !== 'development') options.muteLevels.push('trace');
+    this.log = new UniversalLog(options);
+
     this.notifier = new EasyNotifier({ appName: this.name });
 
     switch (this.environment) {

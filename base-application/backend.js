@@ -2,6 +2,8 @@
 
 let argv = require('minimist')(process.argv.slice(2));
 import sleep from 'sleep-promise';
+import { CloudWatchLogs } from 'easy-aws';
+import { AWSCloudWatchLogsOutput } from 'universal-log';
 import BaseApplication from './';
 
 export class BaseBackendApplication extends BaseApplication {
@@ -13,6 +15,17 @@ export class BaseBackendApplication extends BaseApplication {
     process.on('uncaughtException', err => {
       this.handleUncaughtException(err);
     });
+
+    this.awsConfig = {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION
+    };
+
+    if (this.environment !== 'development') {
+      let cloudWatchLogs = new CloudWatchLogs(this.awsConfig);
+      this.log.addOutput(new AWSCloudWatchLogsOutput(cloudWatchLogs));
+    }
   }
 
   handleUncaughtException(err) {
