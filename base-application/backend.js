@@ -24,21 +24,19 @@ export class BaseBackendApplication extends BaseApplication {
     };
 
     if (this.environment !== 'development') {
-      if (!(this.awsConfig.accessKeyId && this.awsConfig.secretAccessKey && this.awsConfig.region)) {
-        throw new Error('AWS configuration is incomplete');
+      if (this.awsConfig.accessKeyId && this.awsConfig.secretAccessKey && this.awsConfig.region) {
+        let cloudWatchLogs = new CloudWatchLogs(this.awsConfig);
+        this.log.addOutput(new AWSCloudWatchLogsOutput(cloudWatchLogs));
       }
-      let cloudWatchLogs = new CloudWatchLogs(this.awsConfig);
-      this.log.addOutput(new AWSCloudWatchLogsOutput(cloudWatchLogs));
     }
 
     if (this.environment !== 'development') {
       let url = process.env.SLACK_INCOMING_WEBHOOK_URL;
       let channel = process.env.SLACK_INCOMING_WEBHOOK_CHANNEL;
-      if (!(url && channel)) {
-        throw new Error('Slack incoming webhook configuration is incomplete');
+      if (url && channel) {
+        let target = new SlackIncomingWebhookTarget(url, { channel });
+        this.notifier.addTarget(target);
       }
-      let target = new SlackIncomingWebhookTarget(url, { channel });
-      this.notifier.addTarget(target);
     }
   }
 
