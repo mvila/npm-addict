@@ -112,11 +112,11 @@ class Application extends BaseBackendApplication {
   }
 
   async start() {
-    this.fetcher.run().catch(err => {
-      this.log.error(err);
-      this.log.emergency('Fetcher crashed');
-      this.notifier.notify(`Fetcher crashed (${err.message})`);
-    });
+    // this.fetcher.run().catch(err => {
+    //   this.log.error(err);
+    //   this.log.emergency('Fetcher crashed');
+    //   this.notifier.notify(`Fetcher crashed (${err.message})`);
+    // });
 
     server.start(this, { port: this.port });
 
