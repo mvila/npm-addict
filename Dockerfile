@@ -11,6 +11,6 @@ WORKDIR /home/npmaddict/npm-addict
 RUN chown --recursive npmaddict:npmaddict .
 USER npmaddict
 
-RUN npm install
+RUN npm install --no-spin
 
 ENTRYPOINT ["npm", "start"]
