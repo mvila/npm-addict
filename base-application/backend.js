@@ -4,6 +4,7 @@ let argv = require('minimist')(process.argv.slice(2));
 import sleep from 'sleep-promise';
 import { CloudWatchLogs } from 'easy-aws';
 import { AWSCloudWatchLogsOutput } from 'universal-log';
+import { SlackIncomingWebhookTarget } from 'easy-notifier';
 import BaseApplication from './';
 
 export class BaseBackendApplication extends BaseApplication {
@@ -23,8 +24,21 @@ export class BaseBackendApplication extends BaseApplication {
     };
 
     if (this.environment !== 'development') {
+      if (!(this.awsConfig.accessKeyId && this.awsConfig.secretAccessKey && this.awsConfig.region)) {
+        throw new Error('AWS configuration is incomplete');
+      }
       let cloudWatchLogs = new CloudWatchLogs(this.awsConfig);
       this.log.addOutput(new AWSCloudWatchLogsOutput(cloudWatchLogs));
+    }
+
+    if (this.environment !== 'development') {
+      let url = process.env.SLACK_INCOMING_WEBHOOK_URL;
+      let channel = process.env.SLACK_INCOMING_WEBHOOK_CHANNEL;
+      if (!(url && channel)) {
+        throw new Error('Slack incoming webhook configuration is incomplete');
+      }
+      let target = new SlackIncomingWebhookTarget(url, { channel });
+      this.notifier.addTarget(target);
     }
   }
 

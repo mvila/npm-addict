@@ -38,8 +38,7 @@ function start(app, options = {}) {
       documentPath: ctx.path,
       userAgentOverride: ctx.headers['user-agent'],
       documentReferrer: ctx.headers['referer'],
-      userLanguage: ctx.headers['accept-language'],
-      strictCidFormat: false
+      userLanguage: ctx.headers['accept-language']
     };
     ctx.visitor.event(options, function(err) {
       if (err) {
