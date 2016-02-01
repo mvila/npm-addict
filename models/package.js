@@ -30,12 +30,12 @@ export class Package extends Model {
       return false;
     }
 
-    let promote = this.getPromoteProperty();
-    if (promote != null) {
+    let reveal = this.getRevealProperty();
+    if (reveal != null) {
       if (log) {
-        log.notice(`'${this.name}' package has a promote property set to ${promote ? 'true' : 'false'}`);
+        log.notice(`'${this.name}' package has a reveal property set to ${reveal ? 'true' : 'false'}`);
       }
-      return promote;
+      return reveal;
     }
 
     let verification = this.verifyGitHubRepositoryOwnership();
@@ -56,13 +56,13 @@ export class Package extends Model {
     return false;
   }
 
-  getPromoteProperty() {
+  getRevealProperty() {
     let pkg = this.npmResult;
     let latestVersion = pkg['dist-tags'] && pkg['dist-tags'].latest;
     if (!latestVersion) return undefined;
     pkg = pkg.versions && pkg.versions[latestVersion];
     if (!pkg) return undefined;
-    return pkg.promote;
+    return pkg.reveal;
   }
 
   getGitHubStars() {
