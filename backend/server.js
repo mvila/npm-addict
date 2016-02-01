@@ -4,6 +4,7 @@ import koa from 'koa';
 import cors from 'koa-cors';
 import mount from 'koa-mount';
 import koaRouter from 'koa-router';
+import ua from 'universal-analytics';
 
 function start(app, options = {}) {
   let v1 = koa();
@@ -13,7 +14,39 @@ function start(app, options = {}) {
   v1.use(router.routes());
   v1.use(router.allowedMethods());
 
-  router.get('/new-packages', function *() {
+  function *createUAVisitor(next) {
+    try {
+      let trackingId = process.env.GOOGLE_ANALYTICS_TRACKING_ID;
+      if (trackingId) {
+        let userId;
+        if (this.query.clientId) userId = 'client-' + this.query.clientId;
+        let options = {
+          ipOverride: this.request.ip,
+          documentHostName: this.hostname,
+          documentPath: this.path,
+          userAgentOverride: this.headers['user-agent'],
+          documentReferrer: this.headers['referer'],
+          userLanguage: this.headers['accept-language'],
+          strictCidFormat: false
+        };
+        this.visitor = ua(trackingId, userId, options);
+      }
+    } catch (err) {
+      app.log.notice(`An error occured while creating an Universal Analytics visitor (${err.message})`);
+    }
+    yield next;
+  }
+
+  function sendUAEvent(visitor, category, action) {
+    if (!visitor) return;
+    visitor.event(category, action, function(err) {
+      if (err) {
+        app.log.notice(`An error occured while sending an Universal Analytics event (${err.message})`);
+      }
+    });
+  }
+
+  router.get('/new-packages', createUAVisitor, function *() {
     let startAfter = this.query.startAfter;
     let packages = yield app.store.Package.find({
       query: { visible: true },
@@ -22,6 +55,7 @@ function start(app, options = {}) {
       reverse: true,
       limit: 100
     });
+
     let results = packages.map(function(pkg) {
       return {
         id: pkg.id,
@@ -32,7 +66,10 @@ function start(app, options = {}) {
         date: pkg.itemCreatedOn
       };
     });
+
     this.body = results;
+
+    sendUAEvent(this.visitor, 'backend', 'getNewPackages');
   });
 
   // === Server initialization ===

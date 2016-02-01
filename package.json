@@ -66,6 +66,7 @@
     "rimraf": "^2.5.1",
     "sleep-promise": "^1.0.0",
     "uglify-js": "^2.6.1",
+    "universal-analytics": "^0.3.10",
     "universal-log": "^0.3.5",
     "watchify": "^3.7.0"
   },
