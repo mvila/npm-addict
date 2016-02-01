@@ -20,7 +20,7 @@ function start(app, options = {}) {
       if (trackingId) {
         let userId;
         if (this.query.clientId) userId = 'client-' + this.query.clientId;
-        this.visitor = ua(trackingId, userId, { strictCidFormat: false }).debug();
+        this.visitor = ua(trackingId, userId, { strictCidFormat: false });
       }
     } catch (err) {
       app.log.notice(`An error occured while creating an Universal Analytics visitor (${err.message})`);
@@ -30,10 +30,12 @@ function start(app, options = {}) {
 
   function sendUAEvent(ctx, category, action) {
     if (!ctx.visitor) return;
+    let ip = ctx.request.ip;
+    if (ip.startsWith('::ffff:')) ip = ip.substr(7);
     let options = {
       eventCategory: category,
       eventAction: action,
-      ipOverride: ctx.request.ip,
+      ipOverride: ip,
       documentHostName: ctx.hostname,
       documentPath: ctx.path,
       userAgentOverride: ctx.headers['user-agent'],
