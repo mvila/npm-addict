@@ -13,14 +13,14 @@ export class FAQ extends React.Component {
 
         <hr style={[s.mt25, s.mb2]} />
 
-        <h3>Why I created this website?</h3>
+        <h3>Why was this website created?</h3>
         <p>Because I needed it and I guess I'm not the only one! There are tons of awesome packages in the npm registry. Unfortunately, they are difficult to search for and it is almost impossible to stumble upon them if they don't belong to a trending category or the author is unknown.</p>
 
         <h3>How many new packages are published every day?</h3>
-        <p>After filtering (see bellow), an average of 20 packages are published every day. It is then perfectly readable, and believe me, it's worth it! :)</p>
+        <p>After filtering (see below), an average of 20 packages are published every day. It is then perfectly readable, and believe me, it's worth it! :)</p>
 
         <h3>How packages are filtered?</h3>
-        <p>A large majority of packages (more than 2 out of 3) are published in the npm registry when they are not ready to be unveiled. How to filter them? I believe it should be the responsibility of each author to indicate whether or not a package should be exposed to the community. Unfortunately, there is no official property in the <code>package.json</code> file to indicate that. We can define and agree on such a property and I am trying to push in this direction with the <code>reveal</code> property (see bellow).</p>
+        <p>A large majority of packages (more than 2 out of 3) are published in the npm registry when they are not ready to be unveiled. How to filter them? I believe it should be the responsibility of each author to indicate whether or not a package should be exposed to the community. Unfortunately, there is no official property in the <code>package.json</code> file to indicate that. We can define and agree on such a property and I am trying to push in this direction with the <code>reveal</code> property (see below).</p>
         <p>Anyway,  the adoption will take time, so until then I filter the packages based on the number of GitHub stars. A minimum of 3 stars is required for a package to be referenced. I know it's not perfect, all packages are not hosted by GitHub, but it's a start.</p>
 
         <h3>What is the <code>reveal</code> property?</h3>
