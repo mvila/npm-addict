@@ -87,6 +87,7 @@ class Application extends BaseFrontendApplication {
 
     this.loadingPackages = false;
     this.emit('didChange');
+    this.emit('packages.didLoad');
   }
 }
 

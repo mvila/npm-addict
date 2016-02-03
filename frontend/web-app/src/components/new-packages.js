@@ -15,10 +15,23 @@ export class NewPackages extends React.Component {
   componentWillMount() {
     this.handleAppDidChange = () => this.forceUpdate();
     this.context.app.on('didChange', this.handleAppDidChange);
+
+    this.handleBeforeUnload = () => {
+      window.history.replaceState({ scrollY: window.scrollY }, null);
+    };
+    window.addEventListener('beforeunload', this.handleBeforeUnload, false);
+  }
+
+  componentDidMount() {
+    if (window.history.state && window.history.state.scrollY) {
+      window.scroll(0, window.history.state.scrollY);
+      window.history.replaceState(null, null);
+    }
   }
 
   componentWillUnmount() {
     this.context.app.off('didChange', this.handleAppDidChange);
+    window.removeEventListener('unload', this.handleBeforeUnload);
   }
 
   loadMore() {
