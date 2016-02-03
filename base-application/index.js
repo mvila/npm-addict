@@ -7,11 +7,12 @@ import EasyNotifier from 'easy-notifier';
 let pkg = require('../package.json');
 
 export class BaseApplication extends EventEmitterMixin() {
-  constructor({ name, displayName, version } = {}) {
+  constructor({ name, displayName, description, version } = {}) {
     super();
 
     this.name = name || pkg.name;
     this.displayName = displayName || pkg.displayName;
+    this.description = description || pkg.description;
     this.version = version || pkg.version;
     this.projectName = pkg.name;
 

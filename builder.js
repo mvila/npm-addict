@@ -48,6 +48,7 @@ async function build(app, options = {}) {
   function resolveVariables(str) {
     str = str.replace(/\{environment\}/g, app.environment);
     str = str.replace(/\{displayName\}/g, app.displayName);
+    str = str.replace(/\{description\}/g, app.description);
     str = str.replace(/\{version\}/g, app.version);
     str = str.replace(/\{buildNumber\}/g, buildNumber);
     return str;
