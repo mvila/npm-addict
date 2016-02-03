@@ -1,5 +1,7 @@
 .eslintrc
-.travis.yml
 artwork
+notes.js
 test.js
+data
 env
+frontend/web-app/dist
