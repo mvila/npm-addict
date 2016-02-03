@@ -32,6 +32,11 @@ function start(app, options = {}) {
     if (!ctx.visitor) return;
     let ip = ctx.request.ip;
     if (ip.startsWith('::ffff:')) ip = ip.substr(7);
+    let language = ctx.headers['accept-language'];
+    if (language) {
+      let index = language.indexOf('-');
+      if (index > 0) language = language.substr(0, index);
+    }
     let options = {
       eventCategory: category,
       eventAction: action,
@@ -40,7 +45,7 @@ function start(app, options = {}) {
       documentPath: ctx.path,
       userAgentOverride: ctx.headers['user-agent'],
       documentReferrer: ctx.headers['referer'],
-      userLanguage: ctx.headers['accept-language']
+      userLanguage: language
     };
     ctx.visitor.event(options, function(err) {
       if (err) {
