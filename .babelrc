@@ -5,6 +5,7 @@
   "plugins": [
     "transform-decorators-legacy",
     "transform-class-properties",
-    "transform-async-to-generator"
+    "transform-async-to-generator",
+    "transform-function-bind"
   ]
 }

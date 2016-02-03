@@ -51,12 +51,16 @@ function start(app, options = {}) {
 
   router.get('/new-packages', createUAVisitor, function *() {
     let startAfter = this.query.startAfter;
+    let limit = Number(this.query.limit) || 100;
+    if (limit > 300) {
+      throw new Error('\'limit\' parameter cannot be greater than 300');
+    }
     let packages = yield app.store.Package.find({
       query: { visible: true },
       order: 'itemCreatedOn',
       startAfter,
       reverse: true,
-      limit: 100
+      limit
     });
 
     let results = packages.map(function(pkg) {

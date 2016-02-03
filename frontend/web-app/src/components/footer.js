@@ -8,7 +8,7 @@ import s from '../styles';
 export class Footer extends React.Component {
   render() {
     return (
-      <footer style={[s.mb2, s.center, { lineHeight: 1 }]}>
+      <footer style={[s.mb2, s.center, { lineHeight: 1 }, this.props.style]}>
         <small style={[s.fs6, s.grayDarker]}>
           Crafted in Japan by <a href='https://github.com/mvila'>Manuel Vila</a>
         </small>

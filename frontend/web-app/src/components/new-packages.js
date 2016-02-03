@@ -50,14 +50,25 @@ export class NewPackages extends React.Component {
           {
             lists.map(list => <PackageList key={list.id} date={list.date} items={list.packages} />)
           }
-          <div>
-            <button onClick={this.loadMore.bind(this)} style={[s.btn, s.btnOutline, { color: s.$grayDark, borderColor: s.$grayLight }]} disabled={this.context.app.loadingPackages}>
-              {!this.context.app.loadingPackages ? 'More...' : 'Loading...'}
-            </button>
-          </div>
+          {
+            !this.context.app.noMorePackageToLoad ?
+            <div>
+              <Button onClick={::this.loadMore} style={[s.btn, s.btnOutline, { color: s.$grayDark, borderColor: s.$grayLight }]} disabled={this.context.app.loadingPackages}>
+                {!this.context.app.loadingPackages ? 'More...' : 'Loading...'}
+              </Button>
+            </div> :
+            false
+          }
         </div>
       </div>
     );
+  }
+}
+
+@Radium
+class Button extends React.Component {
+  render() {
+    return <button {...this.props} />;
   }
 }
 

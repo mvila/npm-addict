@@ -11,6 +11,8 @@ import LocalData from './local-data';
 import styles from './styles';
 import Page from './components/page';
 
+const PACKAGES_PER_PAGE = 100;
+
 class Application extends BaseFrontendApplication {
   constructor(options) {
     super(options);
@@ -49,7 +51,7 @@ class Application extends BaseFrontendApplication {
 
     let url = `${this.apiURL}new-packages`;
 
-    let query = {};
+    let query = { limit: PACKAGES_PER_PAGE + 1 };
     if (this.packages.length) {
       let lastPackage = this.packages[this.packages.length - 1];
       query.startAfter = lastPackage.date.toJSON();
@@ -63,7 +65,14 @@ class Application extends BaseFrontendApplication {
     if (response.status !== 200) {
       throw new Error(`Bad response from the API while fetching new packages (HTTP status: ${response.status})`);
     }
+
     let fetchedPackages = await response.json();
+    if (fetchedPackages.length > PACKAGES_PER_PAGE) {
+      fetchedPackages.pop();
+      this.noMorePackageToLoad = false;
+    } else {
+      this.noMorePackageToLoad = true;
+    }
 
     for (let pkg of fetchedPackages) {
       this.packages.push({
