@@ -10,6 +10,7 @@ let s = styles;
 
 s.$blue = '#0074D9';
 s.$red = '#cb3837'; // npm red
+s.$redDarker = color(s.$red).darken(0.4).rgbString();
 s.$orange = '#ff851b';
 s.$olive = '#3d9970';
 s.$oliveLighter = color(s.$olive).clearer(0.8).rgbString();
