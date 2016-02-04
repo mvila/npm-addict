@@ -4,6 +4,7 @@ import { LocalStore, model } from 'object-layer';
 import { BackendState } from '../models/backend-state';
 import { Package } from '../models/package';
 import { IgnoredPackage } from '../models/ignored-package';
+import { Post } from '../models/post';
 
 export class Store extends LocalStore {
   @model(BackendState) BackendState;
@@ -11,6 +12,7 @@ export class Store extends LocalStore {
     indexes: ['name', ['visible', 'itemCreatedOn']]
   }) Package;
   @model(IgnoredPackage, { indexes: ['name'] }) IgnoredPackage;
+  @model(Post, { indexes: ['createdOn'] }) Post;
 }
 
 export default Store;
