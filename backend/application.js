@@ -46,7 +46,8 @@ class Application extends BaseBackendApplication {
     let name;
     switch (command) {
       case 'start':
-        result = await this.start();
+        let fetch = this.argv.fetch !== false;
+        result = await this.start({ fetch });
         break;
       case 'show':
         name = this.argv._[1];
@@ -111,12 +112,14 @@ class Application extends BaseBackendApplication {
     await this.store.close();
   }
 
-  async start() {
-    this.fetcher.run().catch(err => {
-      this.log.error(err);
-      this.log.emergency('Fetcher crashed');
-      this.notifier.notify(`Fetcher crashed (${err.message})`);
-    });
+  async start(options = {}) {
+    if (options.fetch) {
+      this.fetcher.run().catch(err => {
+        this.log.error(err);
+        this.log.emergency('Fetcher crashed');
+        this.notifier.notify(`Fetcher crashed (${err.message})`);
+      });
+    }
 
     server.start(this, { port: this.port });
 

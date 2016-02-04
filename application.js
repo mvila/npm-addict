@@ -12,8 +12,10 @@ class Application extends BaseBackendApplication {
   async run() {
     let command = this.argv._[0];
     if (!command) throw new Error('Command is missing');
-    let options = {};
-    if (this.argv.watch) options.watchMode = true;
+    let options = {
+      watch: this.argv.watch,
+      fetch: this.argv.fetch
+    };
     switch (command) {
       case 'build':
         await this.build(options);
@@ -34,7 +36,7 @@ class Application extends BaseBackendApplication {
     let path;
 
     let opts = [];
-    if (options.watchMode) opts.push('--watch');
+    if (options.watch) opts.push('--watch');
 
     path = pathModule.join(__dirname, 'frontend', 'index.js');
     this.spawn('node', path, 'build', ...opts);
@@ -46,8 +48,10 @@ class Application extends BaseBackendApplication {
     let path;
     let node = (options.watchMode ? 'node-dev' : 'node');
 
+    let opts = [];
+    if (options.fetch === false) opts.push('--no-fetch');
     path = pathModule.join(__dirname, 'backend', 'index.js');
-    this.spawn(node, path, 'start');
+    this.spawn(node, path, 'start', ...opts);
 
     path = pathModule.join(__dirname, 'frontend', 'index.js');
     this.spawn(node, path, 'start');

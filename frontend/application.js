@@ -31,9 +31,8 @@ class Application extends BaseBackendApplication {
     if (!command) throw new Error('Command is missing');
     switch (command) {
       case 'build':
-        let options = {};
-        if (this.argv.watch) options.watchMode = true;
-        await this.build(options);
+        let watch = this.argv.watch === true;
+        await this.build({ watch });
         break;
       case 'start':
         await this.start();
@@ -44,43 +43,40 @@ class Application extends BaseBackendApplication {
   }
 
   async build(options = {}) {
-    options = Object.assign(
-      {
-        sourceDir: pathModule.join(__dirname, 'web-app', 'src'),
-        targetDir: pathModule.join(__dirname, 'web-app', 'dist'),
+    await builder.build(this, {
+      sourceDir: pathModule.join(__dirname, 'web-app', 'src'),
+      targetDir: pathModule.join(__dirname, 'web-app', 'dist'),
 
-        vendorDirname: 'vendor',
+      vendorDirname: 'vendor',
 
-        stylesDirname: undefined, // 'styles'
-        sassFilename: undefined,
-        sassDependencyFilenames: [],
-        vendorCSSPaths: [],
-        cssFilename: 'index.css',
+      stylesDirname: undefined, // 'styles'
+      sassFilename: undefined,
+      sassDependencyFilenames: [],
+      vendorCSSPaths: [],
+      cssFilename: 'index.css',
 
-        htmlIndexFilenames: ['index.html'],
+      htmlIndexFilenames: ['index.html'],
 
-        staticFilePaths: [
-          'favicon.png',
-          'images'
-        ],
+      staticFilePaths: [
+        'favicon.png',
+        'images'
+      ],
 
-        inputStylesDirname: undefined, // 'scripts'
-        outputStylesDirname: undefined, // 'scripts'
+      inputStylesDirname: undefined, // 'scripts'
+      outputStylesDirname: undefined, // 'scripts'
 
-        vendorScriptPaths: [],
-        vendorScriptFilename: 'vendor.js',
+      vendorScriptPaths: [],
+      vendorScriptFilename: 'vendor.js',
 
-        appScriptFilename: 'index.js',
-        browserifiedAppScriptFilename: 'index.js',
+      appScriptFilename: 'index.js',
+      browserifiedAppScriptFilename: 'index.js',
 
-        appCacheManifestFilename: undefined,
-        appCachePaths: [],
-        appCacheNetworkPaths: []
-      },
-      options
-    );
+      appCacheManifestFilename: undefined,
+      appCachePaths: [],
+      appCacheNetworkPaths: [],
 
-    await builder.build(this, options);
+      watchMode: options.watch
+    });
   }
 
   async start() {
