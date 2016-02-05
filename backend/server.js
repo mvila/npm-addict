@@ -5,6 +5,7 @@ import cors from 'koa-cors';
 import mount from 'koa-mount';
 import koaRouter from 'koa-router';
 import ua from 'universal-analytics';
+import RSS from 'rss';
 
 function start(app, options = {}) {
   let v1 = koa();
@@ -54,19 +55,29 @@ function start(app, options = {}) {
     });
   }
 
-  router.get('/new-packages', createUAVisitor, function *() {
+  router.get('/packages', createUAVisitor, function *() {
+    let start = this.query.start;
     let startAfter = this.query.startAfter;
+    let end = this.query.end;
+    let endBefore = this.query.endBefore;
+    let reverse = this.query.reverse === '1';
     let limit = Number(this.query.limit) || 100;
     if (limit > 300) {
       throw new Error('\'limit\' parameter cannot be greater than 300');
     }
-    let packages = yield app.store.Package.find({
+
+    let options = {
       query: { visible: true },
       order: 'itemCreatedOn',
-      startAfter,
-      reverse: true,
+      reverse,
       limit
-    });
+    };
+    if (start) options.start = start;
+    if (startAfter) options.startAfter = startAfter;
+    if (end) options.end = end;
+    if (endBefore) options.endBefore = endBefore;
+
+    let packages = yield app.store.Package.find(options);
 
     let results = packages.map(function(pkg) {
       return {
@@ -82,6 +93,71 @@ function start(app, options = {}) {
     this.body = results;
 
     sendUAEvent(this, 'backend', 'getNewPackages');
+  });
+
+  router.get('/feeds/daily', createUAVisitor, function *() {
+    let posts = yield app.store.Post.find({
+      order: 'createdOn',
+      reverse: true,
+      limit: 30
+    });
+
+    let feed = new RSS({
+      title: app.displayName + ' (daily feed)',
+      description: app.description,
+      feed_url: app.url + 'feeds/daily', // eslint-disable-line camelcase
+      site_url: app.frontendURL // eslint-disable-line camelcase
+    });
+
+    for (let post of posts) {
+      feed.item({
+        title: post.title,
+        description: post.content,
+        url: post.url,
+        date: post.createdOn,
+        guid: post.id
+      });
+    }
+
+    let xml = feed.xml({ indent: true });
+
+    this.type = 'application/rss+xml; charset=utf-8';
+    this.body = xml;
+
+    sendUAEvent(this, 'backend', 'getDailyFeed');
+  });
+
+  router.get('/feeds/real-time', createUAVisitor, function *() {
+    let packages = yield app.store.Package.find({
+      query: { visible: true },
+      order: 'itemCreatedOn',
+      reverse: true,
+      limit: 100
+    });
+
+    let feed = new RSS({
+      title: app.displayName + ' (real-time feed)',
+      description: 'One post for every new npm package',
+      feed_url: app.url + 'feeds/real-time', // eslint-disable-line camelcase
+      site_url: app.frontendURL // eslint-disable-line camelcase
+    });
+
+    for (let pkg of packages) {
+      feed.item({
+        title: pkg.name,
+        description: pkg.description,
+        url: pkg.gitHubURL || pkg.npmURL,
+        date: pkg.itemCreatedOn,
+        guid: pkg.id
+      });
+    }
+
+    let xml = feed.xml({ indent: true });
+
+    this.type = 'application/rss+xml; charset=utf-8';
+    this.body = xml;
+
+    sendUAEvent(this, 'backend', 'getRealTimeFeed');
   });
 
   // === Server initialization ===

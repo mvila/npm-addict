@@ -5,8 +5,9 @@ import Radium, { StyleRoot } from 'radium';
 import s from '../styles';
 import Header from './header';
 import Footer from './footer';
-import NewPackages from './new-packages';
+import Packages from './packages';
 import FAQ from './faq';
+import Feeds from './feeds';
 
 @Radium
 export class Page extends React.Component {
@@ -19,22 +20,25 @@ export class Page extends React.Component {
   }
 
   componentDidMount() {
-    this.handleHashChange = () => this.forceUpdate();
-    window.addEventListener('hashchange', this.handleHashChange, false);
+    this.handleCurrentPageDidChange = () => this.forceUpdate();
+    this.props.app.on('currentPage.didChange', this.handleCurrentPageDidChange);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('hashchange', this.handleHashChange);
+    this.props.app.off('currentPage.didChange', this.handleCurrentPageDidChange);
   }
 
   render() {
     let component;
-    switch (window.location.hash) {
-      case '#/faq':
+    switch (this.props.app.currentPage) {
+      case 'faq':
         component = FAQ;
         break;
+      case 'feeds':
+        component = Feeds;
+        break;
       default:
-        component = NewPackages;
+        component = Packages;
     }
 
     return (
@@ -43,7 +47,7 @@ export class Page extends React.Component {
           <Header />
           <div style={[s.flexAuto, s.flex, s.flexColumn, s.bgGrayLightest]}>
             <div style={[s.flexAuto, s.flex, s.px2, s.pt2, s.pb15, { justifyContent: 'center' }]}>
-              {React.createElement(component, { style: { maxWidth: 800 } })}
+              {React.createElement(component, { style: { width: 800 } })}
             </div>
             <Footer />
           </div>

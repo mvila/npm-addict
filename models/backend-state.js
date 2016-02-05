@@ -10,6 +10,8 @@ export class BackendState extends Model {
   @field(Date, {
     defaultValue: () => new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours
   }) lastModificationDate;
+  @field(Date) lastFetchDate;
+  @field(Date) lastDailyFeedPostDate;
   @createdOn() createdOn;
   @updatedOn() updatedOn;
 }

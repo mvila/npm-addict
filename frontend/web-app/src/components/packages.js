@@ -2,12 +2,12 @@
 
 import Radium from 'radium';
 import React from 'react';
-let moment = require('moment');
+import moment from 'moment';
 import s from '../styles';
 import PackageList from './package-list';
 
 @Radium
-export class NewPackages extends React.Component {
+export class Packages extends React.Component {
   static contextTypes = {
     app: React.PropTypes.object
   };
@@ -35,14 +35,19 @@ export class NewPackages extends React.Component {
   }
 
   loadMore() {
-    this.context.app.loadPackages();
+    this.context.app.loadPackages(true);
   }
 
   render() {
+    let packages = this.context.app.packages || [];
+    let currentDate = this.context.app.currentDate;
+
     let lists = [];
     let list;
-    for (let pkg of this.context.app.packages) {
-      let listId = moment(pkg.date).format('YYYYMMDD');
+    for (let pkg of packages) {
+      let date = moment(pkg.date);
+      if (currentDate) date = date.utc();
+      let listId = date.format('YYYYMMDD');
       if (!list || list.id !== listId) {
         list = {
           id: listId,
@@ -85,4 +90,4 @@ class Button extends React.Component {
   }
 }
 
-export default NewPackages;
+export default Packages;

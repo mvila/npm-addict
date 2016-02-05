@@ -6,6 +6,7 @@ import { Style } from 'radium';
 import fetch from 'isomorphic-fetch';
 import idgen from 'idgen';
 import querystring from 'querystring';
+import moment from 'moment';
 import BaseFrontendApplication from '../../../base-application/frontend';
 import LocalData from './local-data';
 import styles from './styles';
@@ -24,6 +25,7 @@ class Application extends BaseFrontendApplication {
 
   async run() {
     await this.initialize();
+
     await this.loadPackages();
 
     ReactDOM.render(
@@ -41,21 +43,69 @@ class Application extends BaseFrontendApplication {
     if (!this.localData.clientId) {
       this.localData.clientId = idgen(16);
     }
+
+    this.currentPage = this.getCurrentPageFromHash();
+    this.currentDate = this.getCurrentDateFromHash();
+
+    window.addEventListener('hashchange', ::this.handleHashChange, false);
+
+    this.on('currentDate.didChange', () => {
+      this.loadPackages();
+    });
   }
 
-  async loadPackages() {
-    if (!this.packages) this.packages = [];
+  handleHashChange() {
+    let page = this.getCurrentPageFromHash();
+    if (page !== this.currentPage) {
+      this.currentPage = page;
+      this.emit('currentPage.didChange');
+    }
+    if (page === 'packages') {
+      let date = this.getCurrentDateFromHash();
+      if (date !== this.currentDate) {
+        this.currentDate = date;
+        this.emit('currentDate.didChange');
+      }
+    }
+  }
+
+  getCurrentPageFromHash() {
+    switch (window.location.hash) {
+      case '#/faq':
+        return 'faq';
+      case '#/feeds':
+        return 'feeds';
+      default:
+        return 'packages';
+    }
+  }
+
+  getCurrentDateFromHash() {
+    if (!window.location.hash.startsWith('#/days/')) return undefined;
+    let date = window.location.hash.substr(7);
+    date = moment.utc(date).toDate();
+    return date;
+  }
+
+  async loadPackages(more) {
+    if (!more) this.packages = [];
 
     this.loadingPackages = true;
     this.emit('didChange');
 
-    let url = `${this.apiURL}new-packages`;
+    let url = `${this.apiURL}packages`;
 
     let query = { limit: PACKAGES_PER_PAGE + 1 };
     if (this.packages.length) {
       let lastPackage = this.packages[this.packages.length - 1];
       query.startAfter = lastPackage.date.toJSON();
+    } else if (this.currentDate) {
+      query.start = this.currentDate.toJSON();
     }
+    if (this.currentDate) {
+      query.endBefore = moment(this.currentDate).add(1, 'days').toDate().toJSON();
+    }
+    query.reverse = this.currentDate ? '0' : '1';
     let clientId = this.localData.clientId;
     if (clientId) query.clientId = clientId;
     query = querystring.stringify(query);

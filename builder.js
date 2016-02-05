@@ -51,6 +51,9 @@ async function build(app, options = {}) {
     str = str.replace(/\{description\}/g, app.description);
     str = str.replace(/\{version\}/g, app.version);
     str = str.replace(/\{buildNumber\}/g, buildNumber);
+    str = str.replace(/\{url\}/g, app.url);
+    str = str.replace(/\{frontendURL\}/g, app.frontendURL);
+    str = str.replace(/\{apiURL\}/g, app.apiURL);
     return str;
   }
 

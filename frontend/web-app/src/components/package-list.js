@@ -2,22 +2,32 @@
 
 import Radium from 'radium';
 import React from 'react';
-let moment = require('moment');
+import moment from 'moment';
 import s from '../styles';
 import PackageItem from './package-item';
 
 @Radium
 export class PackageList extends React.Component {
+  static contextTypes = {
+    app: React.PropTypes.object
+  };
+
   render() {
+    let currentDate = this.context.app.currentDate;
+
     let { date, items } = this.props;
 
     let displayDate;
-    if (moment(date).isSame(moment(), 'day')) {
-      displayDate = 'Today';
-    } else if (moment(date).isSame(moment().subtract(1, 'days'), 'day')) {
-      displayDate = 'Yesterday';
+    if (!currentDate) {
+      if (moment(date).isSame(moment(), 'day')) {
+        displayDate = 'Today';
+      } else if (moment(date).isSame(moment().subtract(1, 'days'), 'day')) {
+        displayDate = 'Yesterday';
+      } else {
+        displayDate = moment(date).format('MMMM Do');
+      }
     } else {
-      displayDate = moment(date).format('MMMM Do');
+      displayDate = moment.utc(date).format('MMMM Do');
     }
 
     return (

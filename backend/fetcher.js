@@ -7,11 +7,11 @@ import parseGitHubURL from 'github-url-to-object';
 const FETCH_TIMEOUT = 3 * 60 * 1000; // 3 minutes
 
 export class Fetcher {
-  constructor({ context } = {}) {
-    this.context = context;
-    this.log = context.log;
-    this.store = context.store;
-    this.state = context.state;
+  constructor({ app } = {}) {
+    this.app = app;
+    this.log = app.log;
+    this.store = app.store;
+    this.state = app.state;
 
     this.npmUpdatedPackagesURL = 'http://registry.npmjs.org/-/_view/browseUpdated?group_level=2';
     this.npmWebsitePackageURL = 'https://www.npmjs.com/package/';
@@ -34,8 +34,9 @@ export class Fetcher {
       }
       if (result.lastDate) {
         this.state.lastModificationDate = result.lastDate;
-        await this.state.save();
       }
+      this.state.lastFetchDate = new Date();
+      await this.state.save();
       await sleep(5 * 60 * 1000); // 5 minutes
     }
   }

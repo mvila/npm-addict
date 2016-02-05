@@ -11,7 +11,7 @@ export class FAQ extends React.Component {
       <div style={[s.p2, s.bgWhite, s.border, s.rounded, this.props.style]}>
         <h2 style={[s.mt0, s.mb1, s.grayDarker, { lineHeight: 1 }]}>FAQ</h2>
 
-        <hr style={[s.mt25, s.mb2]} />
+        <hr style={[s.mt25, s.mb2, s.smShow]} />
 
         <h3>Why was this website created?</h3>
         <p>Because I needed it and I guess I'm not the only one! There are tons of awesome packages in the npm registry. Unfortunately, they are difficult to search for and it is almost impossible to stumble upon them if they don't belong to a trending category or the author is unknown.</p>

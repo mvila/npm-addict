@@ -4,6 +4,7 @@ import util from 'util';
 import BaseBackendApplication from '../base-application/backend';
 import Store from './store';
 import Fetcher from './fetcher';
+import Feeder from './feeder';
 import server from './server';
 
 class Application extends BaseBackendApplication {
@@ -105,7 +106,8 @@ class Application extends BaseBackendApplication {
       this.state = new this.store.BackendState();
     }
 
-    this.fetcher = new Fetcher({ context: this });
+    this.fetcher = new Fetcher({ app: this });
+    this.feeder = new Feeder({ app: this });
   }
 
   async close() {
@@ -120,6 +122,12 @@ class Application extends BaseBackendApplication {
         this.notifier.notify(`Fetcher crashed (${err.message})`);
       });
     }
+
+    this.feeder.run().catch(err => {
+      this.log.error(err);
+      this.log.emergency('Feeder crashed');
+      this.notifier.notify(`Feeder crashed (${err.message})`);
+    });
 
     server.start(this, { port: this.port });
 

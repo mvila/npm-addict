@@ -46,7 +46,7 @@ class Application extends BaseBackendApplication {
     this.notifier.notify(`${this.displayName} started (v${this.version})`);
 
     let path;
-    let node = (options.watchMode ? 'node-dev' : 'node');
+    let node = (options.watch ? 'node-dev' : 'node');
 
     let opts = [];
     if (options.fetch === false) opts.push('--no-fetch');
