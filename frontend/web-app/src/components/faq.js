@@ -14,7 +14,7 @@ export class FAQ extends React.Component {
         <hr style={[s.mt25, s.mb2, s.smShow]} />
 
         <h3>Why was this website created?</h3>
-        <p>Because I needed it and I guess I'm not the only one! There are tons of awesome packages in the npm registry. Unfortunately, they are difficult to search for and it is almost impossible to stumble upon them if they don't belong to a trending category or the author is unknown.</p>
+        <p>There are tons of awesome packages in the npm registry. Unfortunately, they are difficult to search for and it is almost impossible to stumble upon them if they don't belong to a trending category or the author is unknown. This website lists (almost) every packages created, check it every day so you don't miss anything.</p>
 
         <h3>How many new packages are published every day?</h3>
         <p>After filtering (see below), an average of 20 packages are published every day. It is then perfectly readable, and believe me, it's worth it! :)</p>
