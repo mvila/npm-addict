@@ -3,6 +3,7 @@
 import fetch from 'isomorphic-fetch';
 import sleep from 'sleep-promise';
 import parseGitHubURL from 'github-url-to-object';
+let stripMarkdown = require('remark').use(require('strip-markdown'));
 
 const FETCH_TIMEOUT = 3 * 60 * 1000; // 3 minutes
 
@@ -139,9 +140,21 @@ export class Fetcher {
         gitHubPackageJSON = await this.getGitHubPackageJSON(parsedGitHubURL);
       }
 
+      let description = npmResult.description;
+      if (gitHubPackageJSON && !gitHubPackageJSON.description) {
+        // When the description is missing from package.json,
+        // npm generates one from the README, let's try to remove
+        // markdown tags from it
+        let original = description;
+        description = stripMarkdown.process(description);
+        if (description !== original) {
+          this.log.warning(`Markdown tags have been removed from a description ("${original}" => "${description}")`);
+        }
+      }
+
       return {
         name: npmResult.name,
-        description: npmResult.description,
+        description,
         npmURL,
         gitHubURL: parsedGitHubURL && parsedGitHubURL.https_url,
         createdOn,
