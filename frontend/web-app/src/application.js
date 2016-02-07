@@ -9,6 +9,7 @@ import querystring from 'querystring';
 import moment from 'moment';
 import BaseFrontendApplication from '../../../base-application/frontend';
 import LocalData from './local-data';
+import Package from '../../../models/package';
 import styles from './styles';
 import Page from './components/page';
 
@@ -98,7 +99,7 @@ class Application extends BaseFrontendApplication {
     let query = { limit: PACKAGES_PER_PAGE + 1 };
     if (this.packages.length) {
       let lastPackage = this.packages[this.packages.length - 1];
-      query.startAfter = lastPackage.date.toJSON();
+      query.startAfter = lastPackage.itemCreatedOn.toJSON();
     } else if (this.currentDate) {
       query.start = this.currentDate.toJSON();
     }
@@ -125,14 +126,7 @@ class Application extends BaseFrontendApplication {
     }
 
     for (let pkg of fetchedPackages) {
-      this.packages.push({
-        id: pkg.id,
-        name: pkg.name,
-        description: pkg.description,
-        npmURL: pkg.npmURL,
-        gitHubURL: pkg.gitHubURL,
-        date: new Date(pkg.date)
-      });
+      this.packages.push(new Package(pkg));
     }
 
     this.loadingPackages = false;

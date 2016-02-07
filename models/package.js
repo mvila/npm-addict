@@ -22,6 +22,22 @@ export class Package extends Model {
     return packages[0];
   }
 
+  get formattedDescription() {
+    let description = this.description;
+    if (!description) return '';
+    description = description.trim();
+    description = description.charAt(0).toUpperCase() + description.substr(1);
+    let lastChar = description.substr(-1);
+    if (lastChar !== '.' && lastChar !== '!' && lastChar !== '?') {
+      description += '.';
+    }
+    return description;
+  }
+
+  get bestURL() {
+    return this.gitHubURL || this.npmURL;
+  }
+
   determineVisibility(log) {
     if (!this.description) {
       if (log) {

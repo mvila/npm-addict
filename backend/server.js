@@ -4,6 +4,7 @@ import koa from 'koa';
 import cors from 'koa-cors';
 import mount from 'koa-mount';
 import koaRouter from 'koa-router';
+import pick from 'lodash/pick';
 import ua from 'universal-analytics';
 import RSS from 'rss';
 
@@ -80,14 +81,9 @@ function start(app, options = {}) {
     let packages = yield app.store.Package.find(options);
 
     let results = packages.map(function(pkg) {
-      return {
-        id: pkg.id,
-        name: pkg.name,
-        description: pkg.description,
-        npmURL: pkg.npmURL,
-        gitHubURL: pkg.gitHubURL,
-        date: pkg.itemCreatedOn
-      };
+      return pick(pkg, [
+        'id', 'name', 'description', 'npmURL', 'gitHubURL', 'itemCreatedOn'
+      ]);
     });
 
     this.body = results;
@@ -145,8 +141,8 @@ function start(app, options = {}) {
     for (let pkg of packages) {
       feed.item({
         title: pkg.name,
-        description: pkg.description,
-        url: pkg.gitHubURL || pkg.npmURL,
+        description: pkg.formattedDescription,
+        url: pkg.bestURL,
         date: pkg.itemCreatedOn,
         guid: pkg.id
       });

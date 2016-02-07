@@ -54,11 +54,11 @@ export class Feeder {
     let content = '';
     for (let pkg of packages) {
       content += `<p>\n`;
-      content += `<a href="${pkg.gitHubURL || pkg.npmURL}">`;
+      content += `<a href="${pkg.bestURL}">`;
       content += `${escape(pkg.name)}`;
       content += '</a>';
       content += `<br>\n`;
-      content += `${escape(pkg.description)}\n`;
+      content += `${escape(pkg.formattedDescription)}\n`;
       content += `</p>\n`;
     }
 

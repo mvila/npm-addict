@@ -20,7 +20,7 @@ export class PackageItem extends React.Component {
     return (
       <li key='line' style={[s.mt1, { wordWrap: 'break-word' }, { ':hover': {} }]}>
         <div>
-          <a href={item.gitHubURL || item.npmURL} style={[s.bold, { ':hover': { color: s.$redDarker } }]}>{item.name}</a>
+          <a href={item.bestURL} style={[s.bold, { ':hover': { color: s.$redDarker } }]}>{item.name}</a>
           {
             Radium.getState(this.state, 'line', ':hover') ?
             <span>
@@ -31,7 +31,7 @@ export class PackageItem extends React.Component {
           }
         </div>
         <div>
-          {item.description}
+          {item.formattedDescription}
         </div>
       </li>
     );

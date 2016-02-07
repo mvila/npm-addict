@@ -45,13 +45,13 @@ export class Packages extends React.Component {
     let lists = [];
     let list;
     for (let pkg of packages) {
-      let date = moment(pkg.date);
+      let date = moment(pkg.itemCreatedOn);
       if (currentDate) date = date.utc();
       let listId = date.format('YYYYMMDD');
       if (!list || list.id !== listId) {
         list = {
           id: listId,
-          date: pkg.date,
+          date: pkg.itemCreatedOn,
           packages: []
         };
         lists.push(list);
