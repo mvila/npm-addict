@@ -50,7 +50,7 @@ export class Page extends React.Component {
           <Header />
           <div style={[s.flexAuto, s.flex, s.flexColumn, s.bgGrayLightest]}>
             <div style={[s.flexAuto, s.flex, s.px2, s.pt2, s.pb15, { justifyContent: 'center' }]}>
-              {React.createElement(component, { style: [s.flexAuto, { width: 800 }] })}
+              {React.createElement(component, { style: [{ flex: '0 1 auto', minWidth: 0, width: 800 }] })}
             </div>
             <Footer />
           </div>
