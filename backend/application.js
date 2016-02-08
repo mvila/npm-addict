@@ -3,6 +3,7 @@
 import util from 'util';
 import BaseBackendApplication from '../base-application/backend';
 import Store from './store';
+import Twitter from './twitter';
 import Fetcher from './fetcher';
 import Feeder from './feeder';
 import server from './server';
@@ -91,6 +92,11 @@ class Application extends BaseBackendApplication {
           result = await this.updateAll();
         }
         break;
+      case 'tweet':
+        name = this.argv._[1];
+        if (!name) throw new Error('Package name is missing');
+        result = await this.tweet(name);
+        break;
       default:
         throw new Error(`Unknown command '${command}'`);
     }
@@ -106,11 +112,13 @@ class Application extends BaseBackendApplication {
       this.state = new this.store.BackendState();
     }
 
+    this.twitter = new Twitter({ app: this });
     this.fetcher = new Fetcher({ app: this });
     this.feeder = new Feeder({ app: this });
   }
 
   async close() {
+    await this.twitter.close();
     await this.store.close();
   }
 
@@ -216,6 +224,19 @@ class Application extends BaseBackendApplication {
     for (let pkg of packages) {
       await this.fetcher.updatePackage(pkg.name);
     }
+  }
+
+  async tweet(pkg) {
+    if (typeof pkg === 'string') {
+      let name = pkg;
+      pkg = await this.store.Package.getByName(name);
+      if (!pkg) {
+        console.error(`'${name}' package not found`);
+        return;
+      }
+    }
+    let text = pkg.name + ': ' + pkg.formattedDescription;
+    await this.twitter.post(text, pkg.bestURL);
   }
 }
 

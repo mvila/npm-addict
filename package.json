@@ -71,6 +71,7 @@
     "rss": "^1.2.1",
     "sleep-promise": "^1.0.0",
     "strip-markdown": "^0.3.1",
+    "twit": "^2.2.2",
     "uglify-js": "^2.6.1",
     "universal-analytics": "^0.3.10",
     "universal-log": "^0.3.5",

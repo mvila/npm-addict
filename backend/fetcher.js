@@ -82,6 +82,7 @@ export class Fetcher {
     let wasNew = item.isNew;
     await item.save();
     this.log.info(`'${name}' package ${wasNew ? 'created' : 'updated'}`);
+    if (wasNew) await this.app.tweet(item);
   }
 
   async fetchPackage(name) {
@@ -147,6 +148,7 @@ export class Fetcher {
         // markdown tags from it
         let original = description;
         description = stripMarkdown.process(description);
+        description = description.trim();
         if (description !== original) {
           this.log.warning(`Markdown tags have been removed from a description ("${original}" => "${description}")`);
         }
