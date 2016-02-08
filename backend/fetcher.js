@@ -141,7 +141,7 @@ export class Fetcher {
       }
 
       let description = npmResult.description;
-      if (gitHubPackageJSON && !gitHubPackageJSON.description) {
+      if (description && gitHubPackageJSON && !gitHubPackageJSON.description) {
         // When the description is missing from package.json,
         // npm generates one from the README, let's try to remove
         // markdown tags from it
