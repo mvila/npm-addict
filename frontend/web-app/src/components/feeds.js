@@ -23,13 +23,13 @@ export class Feeds extends React.Component {
         <h3>Daily feed</h3>
         <p>
           One post per day:<br />
-          <a href={dailyFeedURL}>{dailyFeedURL}</a>
+          <a href={dailyFeedURL} style={{ wordWrap: 'break-word' }}>{dailyFeedURL}</a>
         </p>
 
         <h3>Real-time feed</h3>
         <p>
           One post for every new package:<br />
-          <a href={realTimeFeedURL}>{realTimeFeedURL}</a>
+        <a href={realTimeFeedURL} style={{ wordWrap: 'break-word' }}>{realTimeFeedURL}</a>
         </p>
       </div>
     );

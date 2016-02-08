@@ -20,7 +20,10 @@ export class Page extends React.Component {
   }
 
   componentDidMount() {
-    this.handleCurrentPageDidChange = () => this.forceUpdate();
+    this.handleCurrentPageDidChange = () => {
+      this.forceUpdate();
+      setTimeout(() => window.scroll(0, 0), 100);
+    };
     this.props.app.on('currentPage.didChange', this.handleCurrentPageDidChange);
   }
 
@@ -47,7 +50,7 @@ export class Page extends React.Component {
           <Header />
           <div style={[s.flexAuto, s.flex, s.flexColumn, s.bgGrayLightest]}>
             <div style={[s.flexAuto, s.flex, s.px2, s.pt2, s.pb15, { justifyContent: 'center' }]}>
-              {React.createElement(component, { style: { width: 800 } })}
+              {React.createElement(component, { style: [s.flexAuto, { width: 800 }] })}
             </div>
             <Footer />
           </div>

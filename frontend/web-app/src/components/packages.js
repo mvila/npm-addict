@@ -60,24 +60,22 @@ export class Packages extends React.Component {
     }
 
     return (
-      <div>
-        <div style={[s.p2, s.bgWhite, s.border, s.rounded, this.props.style]}>
-          <h2 style={[s.mt0, s.mb1, s.grayDarker, { lineHeight: 1 }]}>New Packages</h2>
-          <p style={[s.mb0, s.grayDark, s.smShow]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
-          <hr style={[s.mt15, s.mb2, s.smShow]} />
-          {
-            lists.map(list => <PackageList key={list.id} date={list.date} items={list.packages} />)
-          }
-          {
-            !this.context.app.noMorePackageToLoad ?
-            <div>
-              <Button onClick={::this.loadMore} style={[s.btn, s.btnOutline, { color: s.$grayDark, borderColor: s.$grayLight }]} disabled={this.context.app.loadingPackages}>
-                {!this.context.app.loadingPackages ? 'More...' : 'Loading...'}
-              </Button>
-            </div> :
-            false
-          }
-        </div>
+      <div style={[s.p2, s.bgWhite, s.border, s.rounded, this.props.style]}>
+        <h2 style={[s.mt0, s.mb1, s.grayDarker, { lineHeight: 1 }]}>New Packages</h2>
+        <p style={[s.mb0, s.grayDark, s.smShow]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
+        <hr style={[s.mt15, s.mb2, s.smShow]} />
+        {
+          lists.map(list => <PackageList key={list.id} date={list.date} items={list.packages} />)
+        }
+        {
+          !this.context.app.noMorePackageToLoad ?
+          <div>
+            <Button onClick={::this.loadMore} style={[s.btn, s.btnOutline, { color: s.$grayDark, borderColor: s.$grayLight }]} disabled={this.context.app.loadingPackages}>
+              {!this.context.app.loadingPackages ? 'More...' : 'Loading...'}
+            </Button>
+          </div> :
+          false
+        }
       </div>
     );
   }
