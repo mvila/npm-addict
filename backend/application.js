@@ -6,7 +6,7 @@ import Store from './store';
 import Twitter from './twitter';
 import Fetcher from './fetcher';
 import Feeder from './feeder';
-import server from './server';
+import Server from './server';
 
 class Application extends BackendApplication {
   constructor(options) {
@@ -115,6 +115,7 @@ class Application extends BackendApplication {
     this.twitter = new Twitter({ app: this });
     this.fetcher = new Fetcher({ app: this });
     this.feeder = new Feeder({ app: this });
+    this.server = new Server(this, { port: this.port });
   }
 
   async close() {
@@ -137,7 +138,7 @@ class Application extends BackendApplication {
       this.notifier.notify(`Feeder crashed (${err.message})`);
     });
 
-    server.start(this, { port: this.port });
+    this.server.start();
 
     return 'KEEP_ALIVE';
   }
