@@ -18,7 +18,7 @@ let twit = new Twit({
   timeout_ms: 60*1000 // eslint-disable-line
 });
 
-twit.post('statuses/update', { status: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ultricies cursus venenatis. Vestibulum non libero. xxxxxxxxxxxxx iuiuiuoiu kj lkjlkjl jlkjdsglkjsdg https://en.wikipedia.org/wiki/Lorem_ipsum' }, function(err, data) {
+twit.post('statuses/update', { status: 'Lorem ipsum' }, function(err, data) {
   console.log(err);
   console.log(data);
 });

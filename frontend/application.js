@@ -2,8 +2,8 @@
 
 let pathModule = require('path');
 import BackendApplication from '../backend-application';
-import Builder from '../builder';
-import server from '../server';
+import Builder from './builder';
+import Server from './server';
 
 class Application extends BackendApplication {
   constructor(options) {
@@ -82,10 +82,12 @@ class Application extends BackendApplication {
   }
 
   async start() {
-    server.start(this, {
+    let server = new Server(this, {
       port: this.port,
       path: pathModule.join(__dirname, 'dist')
     });
+
+    server.start();
   }
 }
 
