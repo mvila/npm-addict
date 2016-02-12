@@ -8,11 +8,8 @@ import parseGitHubURL from 'github-url-to-object';
 const FETCH_TIMEOUT = 3 * 60 * 1000; // 3 minutes
 
 export class Fetcher {
-  constructor({ app } = {}) {
+  constructor(app) {
     this.app = app;
-    this.log = app.log;
-    this.store = app.store;
-    this.state = app.state;
 
     this.npmUpdatedPackagesURL = 'http://registry.npmjs.org/-/_view/browseUpdated?group_level=2';
     this.npmWebsitePackageURL = 'https://www.npmjs.com/package/';
@@ -27,17 +24,17 @@ export class Fetcher {
 
   async run() {
     while (true) {
-      let startDate = new Date(this.state.lastModificationDate.valueOf() + 1);
+      let startDate = new Date(this.app.state.lastModificationDate.valueOf() + 1);
       let result = await this.findUpdatedPackages(startDate);
-      this.log.notice(`${result.packages.length} updated packages found in npm registry`);
+      this.app.log.notice(`${result.packages.length} updated packages found in npm registry`);
       for (let name of result.packages) {
         await this.updatePackage(name);
       }
       if (result.lastDate) {
-        this.state.lastModificationDate = result.lastDate;
+        this.app.state.lastModificationDate = result.lastDate;
       }
-      this.state.lastFetchDate = new Date();
-      await this.state.save();
+      this.app.state.lastFetchDate = new Date();
+      await this.app.state.save();
       await sleep(5 * 60 * 1000); // 5 minutes
     }
   }
@@ -60,7 +57,7 @@ export class Fetcher {
         lastDate = new Date(row.key[0]);
       }
     } catch (err) {
-      this.log.warning(`An error occured while fetching updated packages from npm registry (${err.message})`);
+      this.app.log.warning(`An error occured while fetching updated packages from npm registry (${err.message})`);
     }
     return { packages, lastDate };
   }
@@ -68,28 +65,28 @@ export class Fetcher {
   async updatePackage(name) {
     let pkg = await this.fetchPackage(name);
     if (!pkg) return;
-    let item = await this.store.Package.getByName(name);
-    if (!item) item = new this.store.Package();
+    let item = await this.app.store.Package.getByName(name);
+    if (!item) item = new this.app.store.Package();
     Object.assign(item, pkg);
-    let visible = item.determineVisibility(this.log);
+    let visible = item.determineVisibility(this.app.log);
     if (item.isNew && !visible) return;
     if (visible !== item.visible) {
       if (!item.isNew) {
-        this.log.info(`'${name}' package visibility changed to ${visible ? 'visible' : 'invisible'}`);
+        this.app.log.info(`'${name}' package visibility changed to ${visible ? 'visible' : 'invisible'}`);
       }
       item.visible = visible;
     }
     let wasNew = item.isNew;
     await item.save();
-    this.log.info(`'${name}' package ${wasNew ? 'created' : 'updated'}`);
+    this.app.log.info(`'${name}' package ${wasNew ? 'created' : 'updated'}`);
     if (wasNew) await this.app.tweet(item);
   }
 
   async fetchPackage(name) {
     try {
-      let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
+      let ignoredPackage = await this.app.store.IgnoredPackage.getByName(name);
       if (ignoredPackage) {
-        this.log.debug(`'${name}' package ignored`);
+        this.app.log.debug(`'${name}' package ignored`);
         return undefined;
       }
 
@@ -98,7 +95,7 @@ export class Fetcher {
       let url = this.npmAPIPackageURL + name;
       let response = await fetch(url, { timeout: FETCH_TIMEOUT });
       if (response.status !== 200) {
-        this.log.warning(`Bad response from npm registry while fetching '${name}' package (HTTP status: ${response.status})`);
+        this.app.log.warning(`Bad response from npm registry while fetching '${name}' package (HTTP status: ${response.status})`);
         return undefined;
       }
       let npmResult = await response.json();
@@ -107,15 +104,15 @@ export class Fetcher {
       let updatedOn = npmResult.time && npmResult.time.modified && new Date(npmResult.time.modified);
 
       if (!createdOn) {
-        this.log.warning(`'${name}' package doesn't have a creation date`);
+        this.app.log.warning(`'${name}' package doesn't have a creation date`);
         return undefined;
       }
-      if (createdOn < this.state.minimumCreationDate) {
-        await this.store.IgnoredPackage.put({
+      if (createdOn < this.app.state.minimumCreationDate) {
+        await this.app.store.IgnoredPackage.put({
           name,
           reason: 'CREATION_DATE_BEFORE_MINIMUM'
         });
-        this.log.info(`'${name}' package has been marked as ignored (creation date: ${createdOn.toISOString()})`);
+        this.app.log.info(`'${name}' package has been marked as ignored (creation date: ${createdOn.toISOString()})`);
         return undefined;
       }
 
@@ -127,13 +124,13 @@ export class Fetcher {
           if (parsedGitHubURL) {
             gitHubResult = await this.fetchGitHubRepository(parsedGitHubURL);
           } else {
-            this.log.debug(`'${name}' package has an invalid GitHub URL (${npmResult.repository.url})`);
+            this.app.log.debug(`'${name}' package has an invalid GitHub URL (${npmResult.repository.url})`);
           }
         } else {
-          this.log.debug(`'${name}' package has a Git respository not hosted by GitHub (${npmResult.repository.url})`);
+          this.app.log.debug(`'${name}' package has a Git respository not hosted by GitHub (${npmResult.repository.url})`);
         }
       } else {
-        this.log.debug(`'${name}' package doesn't have a Git respository`);
+        this.app.log.debug(`'${name}' package doesn't have a Git respository`);
       }
 
       let gitHubPackageJSON;
@@ -167,7 +164,7 @@ export class Fetcher {
         gitHubPackageJSON
       };
     } catch (err) {
-      this.log.warning(`An error occured while fetching '${name}' package from npm registry (${err.message})`);
+      this.app.log.warning(`An error occured while fetching '${name}' package from npm registry (${err.message})`);
       return undefined;
     }
   }
@@ -177,7 +174,7 @@ export class Fetcher {
       let url = `${this.gitHubAPIURL}repos/${user}/${repo}`;
       return await this.requestGitHubAPI(url);
     } catch (err) {
-      this.log.warning(`An error occured while fetching '${user}/${repo}' repository from GitHub API (${err.message})`);
+      this.app.log.warning(`An error occured while fetching '${user}/${repo}' repository from GitHub API (${err.message})`);
       return undefined;
     }
   }
@@ -195,7 +192,7 @@ export class Fetcher {
       let pkg = JSON.parse(json);
       return pkg;
     } catch (err) {
-      this.log.warning(`An error occured while fetching package.json file from '${user}/${repo}' GitHub repository (${err.message})`);
+      this.app.log.warning(`An error occured while fetching package.json file from '${user}/${repo}' GitHub repository (${err.message})`);
       return undefined;
     }
   }
@@ -210,10 +207,10 @@ export class Fetcher {
       timeout: FETCH_TIMEOUT
     });
     if (response.status === 404) {
-      this.log.debub(`GitHub API returned a 404 Not Found status for '${url}' URL`);
+      this.app.log.debub(`GitHub API returned a 404 Not Found status for '${url}' URL`);
       return undefined;
     } else if (response.status !== 200) {
-      this.log.warning(`Bad response from GitHub API while requesting '${url}' URL (HTTP status: ${response.status})`);
+      this.app.log.warning(`Bad response from GitHub API while requesting '${url}' URL (HTTP status: ${response.status})`);
       return undefined;
     }
     return await response.json();

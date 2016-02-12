@@ -7,29 +7,26 @@ import sleep from 'sleep-promise';
 const SLEEP_TIME = 1 * 60 * 1000; // 1 minute
 
 export class Feeder {
-  constructor({ app } = {}) {
+  constructor(app) {
     this.app = app;
-    this.log = app.log;
-    this.store = app.store;
-    this.state = app.state;
   }
 
   async run() {
     while (true) {
       await sleep(SLEEP_TIME);
-      if (!this.state.lastFetchDate) continue;
+      if (!this.app.state.lastFetchDate) continue;
       let todayDate = moment.utc().startOf('day').toDate();
-      if (this.state.lastFetchDate < todayDate) continue;
+      if (this.app.state.lastFetchDate < todayDate) continue;
       let yesterdayDate = moment(todayDate).subtract(1, 'days').toDate();
-      let lastDate = this.state.lastDailyFeedPostDate;
+      let lastDate = this.app.state.lastDailyFeedPostDate;
       if (!lastDate) lastDate = moment(yesterdayDate).subtract(3, 'days').toDate();
       let days = moment(yesterdayDate).diff(moment(lastDate), 'days');
       for (let day = 0; day < days; day++) {
         let date = moment(lastDate).add(1, 'days').toDate();
         await this.post(date);
         lastDate = date;
-        this.state.lastDailyFeedPostDate = lastDate;
-        await this.state.save();
+        this.app.state.lastDailyFeedPostDate = lastDate;
+        await this.app.state.save();
       }
     }
   }
@@ -37,7 +34,7 @@ export class Feeder {
   async post(date) {
     let start = date;
     let endBefore = moment(date).add(1, 'days').toDate();
-    let packages = await this.store.Package.find({
+    let packages = await this.app.store.Package.find({
       query: { visible: true },
       order: 'itemCreatedOn',
       start: start.toJSON(),
@@ -45,7 +42,7 @@ export class Feeder {
     });
 
     if (!packages.length) {
-      this.log.warning(`No packages found on ${moment.utc(start).format('LL')}`);
+      this.app.log.warning(`No packages found on ${moment.utc(start).format('LL')}`);
       return;
     }
 
@@ -64,9 +61,9 @@ export class Feeder {
 
     let url = this.app.frontendURL + '#/days/' + moment.utc(start).format('YYYY-MM-DD');
 
-    await this.store.Post.put({ title, content, url });
+    await this.app.store.Post.put({ title, content, url });
 
-    this.log.notice(`New post created for ${moment.utc(start).format('LL')}`);
+    this.app.log.notice(`New post created for ${moment.utc(start).format('LL')}`);
   }
 }
 

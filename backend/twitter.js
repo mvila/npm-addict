@@ -7,9 +7,8 @@ const MAX_LENGTH = 140;
 const CONFIGURATION_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 export class Twitter {
-  constructor({ app } = {}) {
+  constructor(app) {
     this.app = app;
-    this.log = app.log;
 
     this.disabled = !(process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET && process.env.TWITTER_ACCESS_TOKEN && process.env.TWITTER_ACCESS_TOKEN_SECRET);
 
@@ -45,9 +44,9 @@ export class Twitter {
       let data = (await this.twit.get('help/configuration')).data;
       if (data.errors) throw new Error(data.errors[0].message);
       this.configuration = data;
-      this.log.info('Twitter configuration loaded');
+      this.app.log.info('Twitter configuration loaded');
     } catch (err) {
-      this.log.warning(`An error occured while getting configuration from Twitter API (${err.message})`);
+      this.app.log.warning(`An error occured while getting configuration from Twitter API (${err.message})`);
     }
   }
 
@@ -57,9 +56,9 @@ export class Twitter {
     try {
       let data = (await this.twit.post('statuses/update', { status })).data;
       if (data.errors) throw new Error(data.errors[0].message);
-      this.log.info(`"${status}" status tweeted`);
+      this.app.log.info(`"${status}" status tweeted`);
     } catch (err) {
-      this.log.warning(`An error occured while tweeting "${status}" (${err.message})`);
+      this.app.log.warning(`An error occured while tweeting "${status}" (${err.message})`);
     }
   }
 

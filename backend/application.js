@@ -112,9 +112,9 @@ class Application extends BackendApplication {
       this.state = new this.store.BackendState();
     }
 
-    this.twitter = new Twitter({ app: this });
-    this.fetcher = new Fetcher({ app: this });
-    this.feeder = new Feeder({ app: this });
+    this.twitter = new Twitter(this);
+    this.fetcher = new Fetcher(this);
+    this.feeder = new Feeder(this);
     this.server = new Server(this, { port: this.port });
   }
 
