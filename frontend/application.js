@@ -2,7 +2,7 @@
 
 let pathModule = require('path');
 import BackendApplication from '../backend-application';
-import builder from '../builder';
+import Builder from '../builder';
 import server from '../server';
 
 class Application extends BackendApplication {
@@ -43,7 +43,7 @@ class Application extends BackendApplication {
   }
 
   async build(options = {}) {
-    await builder.build(this, {
+    let builder = new Builder(this, {
       sourceDir: pathModule.join(__dirname, 'src'),
       targetDir: pathModule.join(__dirname, 'dist'),
 
@@ -77,6 +77,8 @@ class Application extends BackendApplication {
 
       watchMode: options.watch
     });
+
+    await builder.build();
   }
 
   async start() {
