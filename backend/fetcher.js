@@ -207,7 +207,7 @@ export class Fetcher {
       timeout: FETCH_TIMEOUT
     });
     if (response.status === 404) {
-      this.app.log.debub(`GitHub API returned a 404 Not Found status for '${url}' URL`);
+      this.app.log.debug(`GitHub API returned a 404 Not Found status for '${url}' URL`);
       return undefined;
     } else if (response.status !== 200) {
       this.app.log.warning(`Bad response from GitHub API while requesting '${url}' URL (HTTP status: ${response.status})`);
