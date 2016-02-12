@@ -7,9 +7,9 @@ import fetch from 'isomorphic-fetch';
 import idgen from 'idgen';
 import querystring from 'querystring';
 import moment from 'moment';
-import FrontendApplication from '../../../frontend-application';
+import FrontendApplication from '../../frontend-application';
 import LocalData from './local-data';
-import Package from '../../../models/package';
+import Package from '../../models/package';
 import styles from './styles';
 import Page from './components/page';
 

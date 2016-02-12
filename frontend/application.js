@@ -44,8 +44,8 @@ class Application extends BackendApplication {
 
   async build(options = {}) {
     await builder.build(this, {
-      sourceDir: pathModule.join(__dirname, 'web-app', 'src'),
-      targetDir: pathModule.join(__dirname, 'web-app', 'dist'),
+      sourceDir: pathModule.join(__dirname, 'src'),
+      targetDir: pathModule.join(__dirname, 'dist'),
 
       vendorDirname: 'vendor',
 
@@ -82,7 +82,7 @@ class Application extends BackendApplication {
   async start() {
     server.start(this, {
       port: this.port,
-      path: pathModule.join(__dirname, 'web-app', 'dist')
+      path: pathModule.join(__dirname, 'dist')
     });
   }
 }
