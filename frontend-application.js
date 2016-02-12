@@ -1,8 +1,8 @@
 'use strict';
 
-import BaseApplication from './';
+import BaseApplication from './base-application';
 
-export class BaseFrontendApplication extends BaseApplication {
+export class FrontendApplication extends BaseApplication {
   constructor(options) {
     super(options);
 
@@ -12,4 +12,4 @@ export class BaseFrontendApplication extends BaseApplication {
   }
 }
 
-export default BaseFrontendApplication;
+export default FrontendApplication;

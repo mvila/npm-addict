@@ -7,7 +7,7 @@ import fetch from 'isomorphic-fetch';
 import idgen from 'idgen';
 import querystring from 'querystring';
 import moment from 'moment';
-import BaseFrontendApplication from '../../../base-application/frontend';
+import FrontendApplication from '../../../frontend-application';
 import LocalData from './local-data';
 import Package from '../../../models/package';
 import styles from './styles';
@@ -15,7 +15,7 @@ import Page from './components/page';
 
 const PACKAGES_PER_PAGE = 100;
 
-class Application extends BaseFrontendApplication {
+class Application extends FrontendApplication {
   constructor(options) {
     super(options);
 

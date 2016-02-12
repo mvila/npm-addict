@@ -5,9 +5,9 @@ import sleep from 'sleep-promise';
 import { CloudWatchLogs } from 'easy-aws';
 import { AWSCloudWatchLogsOutput } from 'universal-log';
 import { SlackIncomingWebhookTarget } from 'easy-notifier';
-import BaseApplication from './';
+import BaseApplication from './base-application';
 
-export class BaseBackendApplication extends BaseApplication {
+export class BackendApplication extends BaseApplication {
   constructor(options) {
     super(options);
 
@@ -52,4 +52,4 @@ export class BaseBackendApplication extends BaseApplication {
   }
 }
 
-export default BaseBackendApplication;
+export default BackendApplication;

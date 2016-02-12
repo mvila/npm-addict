@@ -1,14 +1,14 @@
 'use strict';
 
 import util from 'util';
-import BaseBackendApplication from '../base-application/backend';
+import BackendApplication from '../backend-application';
 import Store from './store';
 import Twitter from './twitter';
 import Fetcher from './fetcher';
 import Feeder from './feeder';
 import server from './server';
 
-class Application extends BaseBackendApplication {
+class Application extends BackendApplication {
   constructor(options) {
     super(options);
 
