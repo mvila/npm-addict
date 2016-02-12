@@ -1,9 +1,10 @@
 'use strict';
 
-let koa = require('koa');
-let rewrite = require('koa-rewrite');
-let staticCache = require('koa-static-cache');
-let gzip = require('koa-gzip');
+import koa from 'koa';
+import convert from 'koa-convert';
+import rewrite from 'koa-rewrite';
+import staticCache from 'koa-static-cache';
+import gzip from 'koa-gzip';
 
 export class Server {
   constructor(app, options = {}) {
@@ -13,26 +14,13 @@ export class Server {
   }
 
   start() {
-    function ping() {
-      return function *(next) {
-        if (this.url === '/ping') {
-          this.status = 200;
-          this.body = 'pong';
-          this.logLevel = 'silence';
-        } else {
-          yield next;
-        }
-      };
-    }
-
-    let root = koa();
+    let root = new koa();
     root.name = this.app.name;
     root.proxy = true;
-    root.use(this.app.log.getLoggerMiddleware());
-    root.use(ping());
-    root.use(gzip());
-    root.use(rewrite('/', '/index.html'));
-    root.use(staticCache(this.path, { dynamic: true }));
+    root.use(convert(this.app.log.getLoggerMiddleware()));
+    root.use(convert(gzip()));
+    root.use(convert(rewrite('/', '/index.html')));
+    root.use(convert(staticCache(this.path, { dynamic: true })));
 
     root.listen(this.port, () => {
       this.app.log.info('Listening on port ' + this.port);
