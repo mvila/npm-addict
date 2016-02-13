@@ -1,6 +1,6 @@
 'use strict';
 
-import { Model, primaryKey, field, createdOn, updatedOn } from 'object-layer';
+import { Model, primaryKey, field, createdOn, updatedOn } from 'object-layer/lib/model';
 
 export class Post extends Model {
   @primaryKey() id;

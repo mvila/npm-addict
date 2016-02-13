@@ -211,7 +211,7 @@ export class Builder {
       plugins: ['transform-decorators-legacy', 'transform-class-properties']
     });
     bro.require(inputPath, { entry: true });
-    if (this.watchMode) bro = watchify(bro, { poll: 1000 });
+    if (this.watchMode) bro = watchify(bro);
     let originalBundle = bro.bundle;
     function _bundle() {
       return new Promise(function(resolve, reject) {
