@@ -40,6 +40,8 @@ export class BaseApplication extends EventEmitterMixin() {
       default:
         throw new Error(`Unknown environment ('${this.environment}')`);
     }
+
+    this.googleAnalyticsTrackingId = 'UA-73103232-1';
   }
 }
 

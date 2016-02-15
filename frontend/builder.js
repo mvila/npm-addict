@@ -63,6 +63,7 @@ export class Builder {
     str = str.replace(/\{url\}/g, this.app.url);
     str = str.replace(/\{frontendURL\}/g, this.app.frontendURL);
     str = str.replace(/\{apiURL\}/g, this.app.apiURL);
+    str = str.replace(/\{googleAnalyticsTrackingId\}/g, this.app.googleAnalyticsTrackingId);
     return str;
   }
 

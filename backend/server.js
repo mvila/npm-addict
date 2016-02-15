@@ -21,15 +21,15 @@ export class Server {
 
     async function createUAVisitor(ctx, next) {
       let visitor;
-      try {
-        let trackingId = process.env.GOOGLE_ANALYTICS_TRACKING_ID;
-        if (trackingId) {
-          let userId;
-          if (ctx.query.clientId) userId = 'client-' + ctx.query.clientId;
-          visitor = ua(trackingId, userId, { strictCidFormat: false });
-        }
-      } catch (err) {
-        app.log.notice(`An error occured while creating an Universal Analytics visitor (${err.message})`);
+
+      if (app.environment === 'production') {
+        let userId;
+        if (ctx.query.clientId) userId = 'client-' + ctx.query.clientId;
+        visitor = ua(
+          app.googleAnalyticsTrackingId,
+          userId,
+          { strictCidFormat: false }
+        );
       }
 
       ctx.sendUAEvent = function(category, action) {
