@@ -2,7 +2,7 @@
 
 import Radium from 'radium';
 import React from 'react';
-import s from '../styles';
+import { styles as s, variables as v } from '../styles';
 import MainMenu from './main-menu';
 
 @Radium
@@ -13,12 +13,12 @@ export class Header extends React.Component {
 
   render() {
     return (
-      <header style={[s.flex, s.flexCenter, s.pl15, s.pr2, s.py15, s.borderBottom]}>
-        <a href='#/' style={{ lineHeight: 0 }} title={`v${this.context.app.version}`}>
-          <img src='images/npm-addict-logo-and-tagline.svg' alt={`${this.context.app.displayName} - ${this.context.app.description}`} style={[s.smShow]} />
-          <img src='images/npm-addict-logo.svg' alt={this.context.app.displayName} style={[s.smHide]} />
+      <header style={[{ display: 'flex', alignItems: 'center', padding: '.85rem 1rem .75rem .75rem', borderBottomWidth: v.borderWidth, borderBottomStyle: 'solid', borderBottomColor: v.borderColor }]}>
+        <a href='#/' title={`v${this.context.app.version}`}>
+          <img src='images/npm-addict-logo-and-tagline.svg' alt={`${this.context.app.displayName} - ${this.context.app.description}`} style={[s.hiddenIfSmall]} />
+          <img src='images/npm-addict-logo.svg' alt={this.context.app.displayName} style={[s.shownIfSmall]} />
         </a>
-        <div style={s.flexAuto} />
+        <div style={[{ flexGrow: 1 }]} />
         <MainMenu />
       </header>
     );

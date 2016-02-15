@@ -3,7 +3,7 @@
 import Radium from 'radium';
 import React from 'react';
 import moment from 'moment';
-import s from '../styles';
+import { styles as s, variables as v } from '../styles';
 import PackageItem from './package-item';
 
 @Radium
@@ -31,11 +31,11 @@ export class PackageList extends React.Component {
     }
 
     return (
-      <div style={[s.mt225, s.mb25]}>
-        <div style={[s.inlineBlock, s.mb05, s.px075, s.py05, s.fs5, s.caps, s.bold, s.white, s.bgGray, { lineHeight: 1 }]}>
+      <div style={{ marginBottom: '1rem' }}>
+        <div style={[{ display: 'inline-block', marginBottom: '.625rem', padding: '.25rem .375rem', lineHeight: 1, fontSize: v.smallFontSize, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.1em', color: 'white', backgroundColor: v.lightGray }]}>
           {displayDate}
         </div>
-        <ul style={[s.listReset]}>
+        <ul style={[s.unstyledList]}>
           {
             items.map(item => <PackageItem key={item.id} item={item} />)
           }

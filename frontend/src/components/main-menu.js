@@ -8,13 +8,13 @@ import s from '../styles';
 export class MainMenu extends React.Component {
   render() {
     return (
-      <ul style={[s.listReset, s.m0]}>
-        <li style={[s.inlineBlock, s.ml2]}>
+      <ul style={[s.unstyledList, s.noMargins]}>
+        <li style={[{ display: 'inline-block', marginLeft: '1rem' }]}>
           <a href='#/faq'>
             FAQ
           </a>
         </li>
-        <li style={[s.inlineBlock, s.ml2]}>
+        <li style={[{ display: 'inline-block', marginLeft: '1rem' }]}>
           <a href='https://github.com/mvila/npm-addict/issues'>
             Support
           </a>

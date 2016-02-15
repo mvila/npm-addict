@@ -3,8 +3,9 @@
 import Radium from 'radium';
 import React from 'react';
 import moment from 'moment';
-import s from '../styles';
+import { styles as s } from '../styles';
 import PackageList from './package-list';
+import Button from './button';
 
 @Radium
 export class Packages extends React.Component {
@@ -60,17 +61,17 @@ export class Packages extends React.Component {
     }
 
     return (
-      <div style={[s.p2, s.bgWhite, s.border, s.rounded, this.props.style]}>
-        <h2 style={[s.mt0, s.mb1, s.grayDarker, { lineHeight: 1 }]}>New Packages</h2>
-        <p style={[s.mb0, s.grayDark, s.smShow]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
-        <hr style={[s.mt15, s.mb2, s.smShow]} />
+      <div style={this.props.style}>
+        <h4>New Packages</h4>
+        <p style={[s.hiddenIfSmall]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
+        <hr />
         {
           lists.map(list => <PackageList key={list.id} date={list.date} items={list.packages} />)
         }
         {
           !this.context.app.noMorePackageToLoad ?
           <div>
-            <Button onClick={::this.loadMore} style={[s.btn, s.btnOutline, { color: s.$grayDark, borderColor: s.$grayLight }]} disabled={this.context.app.loadingPackages}>
+            <Button onClick={::this.loadMore} disabled={this.context.app.loadingPackages}>
               {!this.context.app.loadingPackages ? 'More...' : 'Loading...'}
             </Button>
           </div> :
@@ -78,13 +79,6 @@ export class Packages extends React.Component {
         }
       </div>
     );
-  }
-}
-
-@Radium
-class Button extends React.Component {
-  render() {
-    return <button {...this.props} />;
   }
 }
 

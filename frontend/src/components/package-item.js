@@ -2,7 +2,7 @@
 
 import Radium from 'radium';
 import React from 'react';
-import s from '../styles';
+import { styles as s } from '../styles';
 
 const MINI_ICON_STYLE = {
   verticalAlign: '-2px',
@@ -18,9 +18,9 @@ export class PackageItem extends React.Component {
     let { item } = this.props;
 
     return (
-      <li key='line' style={[s.mt1, { wordWrap: 'break-word' }, { ':hover': {} }]}>
+      <li key='line' style={[{ marginBottom: '.5rem', wordWrap: 'break-word', ':hover': {} }]}>
         <div>
-          <a href={item.bestURL} style={[s.bold, { ':hover': { color: s.$redDarker } }]}>{item.name}</a>
+          <a href={item.bestURL} style={[s.bold]}>{item.name}</a>
           {
             Radium.getState(this.state, 'line', ':hover') ?
             <span>

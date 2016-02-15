@@ -2,7 +2,6 @@
 
 import Radium from 'radium';
 import React from 'react';
-import s from '../styles';
 
 @Radium
 export class Feeds extends React.Component {
@@ -15,18 +14,18 @@ export class Feeds extends React.Component {
     let realTimeFeedURL = this.context.app.apiURL + 'feeds/real-time';
 
     return (
-      <div style={[s.p2, s.bgWhite, s.border, s.rounded, this.props.style]}>
-        <h2 style={[s.mt0, s.mb1, s.grayDarker, { lineHeight: 1 }]}>RSS Feeds</h2>
+      <div style={this.props.style}>
+        <h4>RSS Feeds</h4>
 
-        <hr style={[s.mt25, s.mb2, s.smShow]} />
+        <hr />
 
-        <h3>Daily feed</h3>
+        <h5>Daily feed</h5>
         <p>
           One post per day:<br />
           <a href={dailyFeedURL} style={{ wordWrap: 'break-word' }}>{dailyFeedURL}</a>
         </p>
 
-        <h3>Real-time feed</h3>
+        <h5>Real-time feed</h5>
         <p>
           One post for every new package:<br />
         <a href={realTimeFeedURL} style={{ wordWrap: 'break-word' }}>{realTimeFeedURL}</a>

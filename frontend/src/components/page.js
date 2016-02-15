@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Radium, { StyleRoot } from 'radium';
-import s from '../styles';
+import { styles as s, variables as v } from '../styles';
 import Header from './header';
 import Footer from './footer';
 import Packages from './packages';
@@ -46,11 +46,11 @@ export class Page extends React.Component {
 
     return (
       <StyleRoot>
-        <div style={[s.flex, s.flexColumn, { minHeight: '100vh' }]}>
+        <div style={[{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }]}>
           <Header />
-          <div style={[s.flexAuto, s.flex, s.flexColumn, s.bgGrayLightest]}>
-            <div style={[s.flexAuto, s.flex, s.px2, s.pt2, s.pb15, { justifyContent: 'center' }]}>
-              {React.createElement(component, { style: [{ flex: '0 1 auto', minWidth: 0, width: 800 }] })}
+          <div style={[{ flexGrow: 1, display: 'flex', flexDirection: 'column', paddingBottom: '1rem', backgroundColor: v.lightestGray }]}>
+            <div style={[{ flexGrow: 1, display: 'flex', justifyContent: 'center', padding: '1rem 1rem 0.75rem 1rem' }]}>
+              {React.createElement(component, { style: [{ flexShrink: 1, minWidth: 0, width: 800, padding: '1rem', backgroundColor: v.bodyBackgroundColor }, s.bordered, s.rounded ] })}
             </div>
             <Footer />
           </div>
