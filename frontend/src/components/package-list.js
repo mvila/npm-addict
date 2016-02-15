@@ -31,11 +31,11 @@ export class PackageList extends React.Component {
     }
 
     return (
-      <div style={{ marginBottom: '1rem' }}>
-        <div style={[{ display: 'inline-block', marginBottom: '.625rem', padding: '.25rem .375rem', lineHeight: 1, fontSize: v.smallFontSize, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.1em', color: 'white', backgroundColor: v.lightGray }]}>
+      <div style={{ marginBottom: '.75rem' }}>
+        <div style={[{ display: 'inline-block', marginBottom: '.75rem', padding: '.25rem .375rem', lineHeight: 1, fontSize: v.smallFontSize, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.1em', color: 'white', backgroundColor: v.lightGray }]}>
           {displayDate}
         </div>
-        <ul style={[s.unstyledList]}>
+        <ul style={[s.unstyledList, s.noMargins]}>
           {
             items.map(item => <PackageItem key={item.id} item={item} />)
           }
