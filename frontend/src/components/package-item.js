@@ -14,6 +14,10 @@ const MINI_ICON_STYLE = {
 
 @Radium
 export class PackageItem extends React.Component {
+  static propTypes = {
+    item: React.PropTypes.object.isRequired
+  };
+
   render() {
     let { item } = this.props;
 

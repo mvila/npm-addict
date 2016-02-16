@@ -9,6 +9,13 @@ import Button from './button';
 
 @Radium
 export class Packages extends React.Component {
+  static propTypes = {
+    style: React.PropTypes.oneOfType([
+      React.PropTypes.object,
+      React.PropTypes.array
+    ])
+  };
+
   static contextTypes = {
     app: React.PropTypes.object
   };

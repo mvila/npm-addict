@@ -7,6 +7,12 @@ import Color from 'color';
 
 @Radium
 export class Button extends React.Component {
+  static propTypes = {
+    size: React.PropTypes.string,
+    kind: React.PropTypes.string,
+    disabled: React.PropTypes.bool
+  };
+
   render() {
     let xPadding, yPadding, fontSize, borderRadius;
     switch (this.props.size) {

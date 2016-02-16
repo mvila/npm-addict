@@ -1,6 +1,5 @@
 *.md
 node_modules
-lib
 notes.js
 **/dist
 **/vendor

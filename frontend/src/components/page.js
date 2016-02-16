@@ -11,6 +11,10 @@ import Feeds from './feeds';
 
 @Radium
 export class Page extends React.Component {
+  static propTypes = {
+    app: React.PropTypes.object.isRequired
+  };
+
   static childContextTypes = {
     app: React.PropTypes.object
   };

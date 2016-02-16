@@ -5,6 +5,13 @@ import React from 'react';
 
 @Radium
 export class FAQ extends React.Component {
+  static propTypes = {
+    style: React.PropTypes.oneOfType([
+      React.PropTypes.object,
+      React.PropTypes.array
+    ])
+  };
+
   render() {
     return (
       <div style={this.props.style}>

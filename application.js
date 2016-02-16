@@ -62,8 +62,8 @@ class Application extends BackendApplication {
   }
 }
 
-let runner = new Application();
+let app = new Application();
 
-runner.run().catch(function(err) {
-  runner.handleUncaughtException(err);
+app.run().catch(function(err) {
+  app.handleUncaughtException(err);
 });

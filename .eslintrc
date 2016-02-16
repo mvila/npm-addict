@@ -1,13 +1,4 @@
 {
-  "extends": "eslint-config-next",
-  "plugins": [
-    "react"
-  ],
-  "rules": {
-    "jsx-quotes": [1, "prefer-single"],
-    "react/jsx-no-undef": [1],
-    "react/jsx-uses-react": [1],
-    "react/react-in-jsx-scope": [2],
-    "react/self-closing-comp": [1]
-  }
+  "extends": ["eslint-config-next", "plugin:react/recommended"],
+  "plugins": ["react"]
 }

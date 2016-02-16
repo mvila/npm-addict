@@ -241,8 +241,8 @@ class Application extends BackendApplication {
   }
 }
 
-let backend = new Application({ name: 'npm-addict-backend' });
+let app = new Application({ name: 'npm-addict-backend' });
 
-backend.run().catch(function(err) {
-  backend.handleUncaughtException(err);
+app.run().catch(function(err) {
+  app.handleUncaughtException(err);
 });

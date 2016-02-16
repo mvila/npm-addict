@@ -5,6 +5,13 @@ import React from 'react';
 
 @Radium
 export class Feeds extends React.Component {
+  static propTypes = {
+    style: React.PropTypes.oneOfType([
+      React.PropTypes.object,
+      React.PropTypes.array
+    ])
+  };
+
   static contextTypes = {
     app: React.PropTypes.object
   };

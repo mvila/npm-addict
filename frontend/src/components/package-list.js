@@ -8,6 +8,11 @@ import PackageItem from './package-item';
 
 @Radium
 export class PackageList extends React.Component {
+  static propTypes = {
+    date: React.PropTypes.instanceOf(Date).isRequired,
+    items: React.PropTypes.array.isRequired
+  };
+
   static contextTypes = {
     app: React.PropTypes.object
   };
