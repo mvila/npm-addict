@@ -1,7 +1,6 @@
 'use strict';
 
 import v from './variables';
-import m from './mixins';
 
 // Credit: https://github.com/twbs/bootstrap/blob/v4-dev/scss/_reboot.scss
 
@@ -76,12 +75,10 @@ export let reboot = {
     textDecoration: v.linkDecoration
   },
 
-  'a:hover, a:focus': {
+  'a:hover': {
     color: v.linkHoverColor,
     textDecoration: v.linkHoverDecoration
   },
-
-  'a:focus': m.tabFocus,
 
   pre: {
     marginTop: 0,
@@ -123,11 +120,6 @@ export let reboot = {
   label: {
     display: 'inline-block',
     marginBottom: '.5rem'
-  },
-
-  'button:focus': {
-    outline: '1px dotted',
-    'outline ': '5px auto -webkit-focus-ring-color'
   },
 
   'input, button, select, textarea': {
