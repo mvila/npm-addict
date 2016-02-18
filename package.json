@@ -62,6 +62,7 @@
     "object-layer": "^0.4.4",
     "radium": "^0.16.4",
     "radium-normalize": "^1.0.2",
+    "radium-starter": "^0.1.4",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
     "react-icons": "^1.0.3",
@@ -77,7 +78,7 @@
     "watchify": "^3.7.0"
   },
   "devDependencies": {
-    "babel-eslint": "^5.0.0-beta10",
+    "babel-eslint": "^5.0.0",
     "chai": "^3.4.1",
     "eslint": "^2.1.0",
     "eslint-config-next": "^0.1.0",

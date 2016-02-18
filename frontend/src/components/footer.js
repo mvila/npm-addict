@@ -2,14 +2,14 @@
 
 import Radium from 'radium';
 import React from 'react';
-import { variables as v } from '../styles';
+import s from '../styles';
 
 @Radium
 export class Footer extends React.Component {
   render() {
-    let separator = <span style={{ marginLeft: '0.5rem', marginRight: '0.5rem', color: v.lightGray }}>|</span>;
+    let separator = <span style={{ marginLeft: '0.5rem', marginRight: '0.5rem', color: s.$lightGray }}>|</span>;
     return (
-      <footer style={{ textAlign: 'center', fontSize: v.smallFontSize }}>
+      <footer style={{ textAlign: 'center', fontSize: s.$smallFontSize }}>
         <div>
           <a href={'#/feeds'}>RSS Feeds</a>
           {separator}

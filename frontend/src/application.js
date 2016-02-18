@@ -10,7 +10,7 @@ import moment from 'moment';
 import FrontendApplication from '../../frontend-application';
 import LocalData from './local-data';
 import Package from '../../models/package';
-import { elements } from './styles';
+import s from './styles';
 import Page from './components/page';
 
 const PACKAGES_PER_PAGE = 100;
@@ -30,7 +30,7 @@ class Application extends FrontendApplication {
     await this.loadPackages();
 
     ReactDOM.render(
-      <Style rules={elements} />,
+      <Style rules={s.elements} />,
       document.getElementById('styles')
     );
 

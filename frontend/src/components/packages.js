@@ -3,9 +3,8 @@
 import Radium from 'radium';
 import React from 'react';
 import moment from 'moment';
-import { styles as s } from '../styles';
+import s from '../styles';
 import PackageList from './package-list';
-import Button from './button';
 
 @Radium
 export class Packages extends React.Component {
@@ -78,9 +77,9 @@ export class Packages extends React.Component {
         {
           !this.context.app.noMorePackageToLoad ?
           <div>
-            <Button onClick={::this.loadMore} disabled={this.context.app.loadingPackages}>
+            <s.Button onClick={::this.loadMore} disabled={this.context.app.loadingPackages}>
               {!this.context.app.loadingPackages ? 'More...' : 'Loading...'}
-            </Button>
+            </s.Button>
           </div> :
           false
         }
