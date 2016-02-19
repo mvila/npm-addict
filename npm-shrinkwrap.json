@@ -1,6 +1,6 @@
 {
   "name": "npm-addict",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "dependencies": {
     "babel-plugin-transform-async-to-generator": {
       "version": "6.4.0",
