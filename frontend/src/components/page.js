@@ -54,7 +54,7 @@ export class Page extends React.Component {
           <Header />
           <div style={[{ flexGrow: 1, display: 'flex', flexDirection: 'column', paddingBottom: '1rem', backgroundColor: s.$lightestGray }]}>
             <div style={[{ flexGrow: 1, display: 'flex', justifyContent: 'center', padding: '1rem 1rem 0.75rem 1rem' }]}>
-              {React.createElement(component, { style: [{ flexShrink: 1, minWidth: 0, width: 800, padding: '1rem', backgroundColor: s.$bodyBackgroundColor }, s.bordered, s.rounded ] })}
+              {React.createElement(component, { style: [{ flexShrink: 1, minWidth: 0, width: 800, padding: '1rem', backgroundColor: s.$bodyBackgroundColor }, s.border, s.rounded ] })}
             </div>
             <Footer />
           </div>
