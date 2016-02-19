@@ -1,5 +1,6 @@
 'use strict';
 
+require('autotrack');
 import BaseApplication from './base-application';
 
 export class FrontendApplication extends BaseApplication {
