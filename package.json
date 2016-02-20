@@ -1,7 +1,7 @@
 {
   "name": "npm-addict",
   "displayName": "npm addict",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Your daily injection of npm packages",
   "author": "Manuel Vila <mvila@3base.com>",
   "license": "MIT",
