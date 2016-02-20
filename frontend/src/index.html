@@ -15,7 +15,6 @@
     <div id="root"></div>
     <script>window.NODE_ENV = '{environment}';</script>
     <script>window.BUILD_NUMBER = {buildNumber};</script>
-    <script src="index.js"></script>
     <script>
       if (window.NODE_ENV === 'production') {
         window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -24,7 +23,7 @@
         ga('send', 'pageview');
       }
     </script>
+    <script src="index.js"></script>
     <script async src='//www.google-analytics.com/analytics.js'></script>
-    <script async src='https://cdn.rawgit.com/googleanalytics/autotrack/0.5.0/autotrack.js'></script>
   </body>
 </html>
