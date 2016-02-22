@@ -2,7 +2,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Style } from 'radium';
 import fetch from 'isomorphic-fetch';
 import idgen from 'idgen';
 import querystring from 'querystring';
@@ -10,8 +9,7 @@ import moment from 'moment';
 import FrontendApplication from '../../frontend-application';
 import LocalData from './local-data';
 import Package from '../../models/package';
-import s from './styles';
-import Page from './components/page';
+import Root from './components/root';
 
 const PACKAGES_PER_PAGE = 100;
 
@@ -30,12 +28,7 @@ class Application extends FrontendApplication {
     await this.loadPackages();
 
     ReactDOM.render(
-      <Style rules={s.elements} />,
-      document.getElementById('styles')
-    );
-
-    ReactDOM.render(
-      <Page app={this} />,
+      <Root app={this} />,
       document.getElementById('root')
     );
   }

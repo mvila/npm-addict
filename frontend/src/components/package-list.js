@@ -1,24 +1,22 @@
 'use strict';
 
-import Radium from 'radium';
 import React from 'react';
 import moment from 'moment';
-import s from '../styles';
+import Common from './common';
 import PackageItem from './package-item';
 
-@Radium
+@Common
 export class PackageList extends React.Component {
   static propTypes = {
     date: React.PropTypes.instanceOf(Date).isRequired,
     items: React.PropTypes.array.isRequired
   };
 
-  static contextTypes = {
-    app: React.PropTypes.object
-  };
-
   render() {
-    let currentDate = this.context.app.currentDate;
+    let t = this.theme;
+    let s = this.styles;
+
+    let currentDate = this.app.currentDate;
 
     let { date, items } = this.props;
 
@@ -37,7 +35,7 @@ export class PackageList extends React.Component {
 
     return (
       <div style={{ marginBottom: '.75rem' }}>
-        <div style={[{ display: 'inline-block', marginBottom: '.75rem', padding: '.25rem .375rem', lineHeight: 1, fontSize: s.$smallFontSize, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.1em', color: 'white', backgroundColor: s.$lightGray }]}>
+        <div style={[{ display: 'inline-block', marginBottom: '.75rem', padding: '.25rem .375rem', lineHeight: 1, fontSize: t.smallFontSize, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.1em' }, s.primaryTextColorForDarkBackground, s.backgroundPrimaryColor]}>
           {displayDate}
         </div>
         <ul style={[s.unstyledList, s.noMargins]}>

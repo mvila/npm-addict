@@ -1,9 +1,9 @@
 'use strict';
 
-import Radium from 'radium';
 import React from 'react';
+import Common from './common';
 
-@Radium
+@Common
 export class FAQ extends React.Component {
   static propTypes = {
     style: React.PropTypes.oneOfType([

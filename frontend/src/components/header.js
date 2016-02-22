@@ -1,22 +1,17 @@
 'use strict';
 
-import Radium from 'radium';
 import React from 'react';
-import s from '../styles';
+import Common from './common';
 import MainMenu from './main-menu';
 
-@Radium
+@Common
 export class Header extends React.Component {
-  static contextTypes = {
-    app: React.PropTypes.object
-  };
-
   render() {
     return (
-      <header style={[{ display: 'flex', alignItems: 'center', padding: '.85rem 1rem .75rem .75rem' }, s.bottomBorder]}>
-        <a href='#/' title={`v${this.context.app.version}`}>
-          <img src='images/npm-addict-logo-and-tagline.svg' alt={`${this.context.app.displayName} - ${this.context.app.description}`} style={[s.hiddenIfSmall]} />
-          <img src='images/npm-addict-logo.svg' alt={this.context.app.displayName} style={[s.shownIfSmall]} />
+      <header style={[{ display: 'flex', alignItems: 'center', padding: '.85rem 1rem .75rem .75rem' }, this.styles.bottomBorder]}>
+        <a href='#/' title={`v${this.app.version}`}>
+          <img src='images/npm-addict-logo-and-tagline.svg' alt={`${this.app.displayName} - ${this.app.description}`} style={[this.styles.hiddenIfSmall]} />
+          <img src='images/npm-addict-logo.svg' alt={this.app.displayName} style={[this.styles.shownIfSmall]} />
         </a>
         <div style={[{ flexGrow: 1 }]} />
         <MainMenu />

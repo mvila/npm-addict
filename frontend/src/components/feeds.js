@@ -1,9 +1,9 @@
 'use strict';
 
-import Radium from 'radium';
 import React from 'react';
+import Common from './common';
 
-@Radium
+@Common
 export class Feeds extends React.Component {
   static propTypes = {
     style: React.PropTypes.oneOfType([
@@ -12,13 +12,9 @@ export class Feeds extends React.Component {
     ])
   };
 
-  static contextTypes = {
-    app: React.PropTypes.object
-  };
-
   render() {
-    let dailyFeedURL = this.context.app.apiURL + 'feeds/daily';
-    let realTimeFeedURL = this.context.app.apiURL + 'feeds/real-time';
+    let dailyFeedURL = this.app.apiURL + 'feeds/daily';
+    let realTimeFeedURL = this.app.apiURL + 'feeds/real-time';
 
     return (
       <div style={this.props.style}>

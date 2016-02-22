@@ -1,15 +1,14 @@
 'use strict';
 
-import Radium from 'radium';
 import React from 'react';
-import s from '../styles';
+import Common from './common';
 
-@Radium
+@Common
 export class Footer extends React.Component {
   render() {
-    let separator = <span style={{ marginLeft: '0.5rem', marginRight: '0.5rem', color: s.$lightGray }}>|</span>;
+    let separator = <span style={{ marginLeft: '0.5rem', marginRight: '0.5rem', color: this.theme.borderColor }}>|</span>;
     return (
-      <footer style={{ textAlign: 'center', fontSize: s.$smallFontSize }}>
+      <footer style={{ textAlign: 'center', fontSize: this.theme.smallFontSize }}>
         <div>
           <a href={'#/feeds'}>RSS Feeds</a>
           {separator}

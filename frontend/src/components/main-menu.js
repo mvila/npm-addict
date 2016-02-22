@@ -1,14 +1,13 @@
 'use strict';
 
-import Radium from 'radium';
 import React from 'react';
-import s from '../styles';
+import Common from './common';
 
-@Radium
+@Common
 export class MainMenu extends React.Component {
   render() {
     return (
-      <ul style={[s.unstyledList, s.noMargins]}>
+      <ul style={[this.styles.unstyledList, this.styles.noMargins]}>
         <li style={[{ display: 'inline-block', marginLeft: '1rem' }]}>
           <a href='#/faq'>
             FAQ

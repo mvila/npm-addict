@@ -1,12 +1,12 @@
 'use strict';
 
-import Radium from 'radium';
 import React from 'react';
 import moment from 'moment';
-import s from '../styles';
+import { Button } from 'radium-starter';
+import Common from './common';
 import PackageList from './package-list';
 
-@Radium
+@Common
 export class Packages extends React.Component {
   static propTypes = {
     style: React.PropTypes.oneOfType([
@@ -15,13 +15,9 @@ export class Packages extends React.Component {
     ])
   };
 
-  static contextTypes = {
-    app: React.PropTypes.object
-  };
-
   componentWillMount() {
     this.handleAppDidChange = () => this.forceUpdate();
-    this.context.app.on('didChange', this.handleAppDidChange);
+    this.app.on('didChange', this.handleAppDidChange);
 
     this.handleBeforeUnload = () => {
       window.history.replaceState({ scrollY: window.scrollY }, null);
@@ -37,17 +33,17 @@ export class Packages extends React.Component {
   }
 
   componentWillUnmount() {
-    this.context.app.off('didChange', this.handleAppDidChange);
+    this.app.off('didChange', this.handleAppDidChange);
     window.removeEventListener('unload', this.handleBeforeUnload);
   }
 
   loadMore() {
-    this.context.app.loadPackages(true);
+    this.app.loadPackages(true);
   }
 
   render() {
-    let packages = this.context.app.packages || [];
-    let currentDate = this.context.app.currentDate;
+    let packages = this.app.packages || [];
+    let currentDate = this.app.currentDate;
 
     let lists = [];
     let list;
@@ -69,17 +65,17 @@ export class Packages extends React.Component {
     return (
       <div style={this.props.style}>
         <h4>New Packages</h4>
-        <p style={[s.hiddenIfSmall]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
+        <p style={[this.styles.hiddenIfSmall]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
         <hr />
         {
           lists.map(list => <PackageList key={list.id} date={list.date} items={list.packages} />)
         }
         {
-          !this.context.app.noMorePackageToLoad ?
+          !this.app.noMorePackageToLoad ?
           <div>
-            <s.Button onClick={::this.loadMore} disabled={this.context.app.loadingPackages}>
-              {!this.context.app.loadingPackages ? 'More...' : 'Loading...'}
-            </s.Button>
+            <Button onClick={::this.loadMore} disabled={this.app.loadingPackages}>
+              {!this.app.loadingPackages ? 'More...' : 'Loading...'}
+            </Button>
           </div> :
           false
         }
