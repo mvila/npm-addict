@@ -35,7 +35,7 @@ export class PackageList extends React.Component {
 
     return (
       <div style={{ marginBottom: '.75rem' }}>
-        <div style={[{ display: 'inline-block', marginBottom: '.75rem', padding: '.25rem .375rem', lineHeight: 1, fontSize: t.smallFontSize, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.1em' }, s.primaryTextColorForDarkBackground, s.backgroundPrimaryColor]}>
+        <div style={[{ display: 'inline-block', marginBottom: '.75rem', padding: '.25rem .375rem', lineHeight: 1, fontSize: t.smallFontSize, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.1em' }, s.inversePrimaryTextColor, s.backgroundPrimaryColor]}>
           {displayDate}
         </div>
         <ul style={[s.unstyledList, s.noMargins]}>

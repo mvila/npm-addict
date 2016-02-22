@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import RadiumStarter from 'radium-starter';
+import { RadiumStarterRoot } from 'radium-starter';
 import Page from './page';
 
 const theme = {
@@ -25,9 +25,9 @@ export class Root extends React.Component {
 
   render() {
     return (
-      <RadiumStarter theme={theme}>
+      <RadiumStarterRoot theme={theme}>
         <Page />
-      </RadiumStarter>
+      </RadiumStarterRoot>
     );
   }
 }
