@@ -38,9 +38,9 @@ export class Page extends React.Component {
     }
 
     return (
-      <div style={[{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }]}>
+      <div style={[{ display: 'flex', flexDirection: 'column', height: '100vh' }]}>
         <Header />
-        <div style={[{ flexGrow: 1, display: 'flex', flexDirection: 'column', paddingBottom: '1rem' }, s.backgroundAltBodyColor]}>
+        <div style={[{ flexGrow: 1, flexShrink: 0, display: 'flex', flexDirection: 'column', paddingBottom: '1rem' }, s.backgroundAltBodyColor]}>
           <div style={[{ flexGrow: 1, display: 'flex', justifyContent: 'center', padding: '1rem 1rem 0.75rem 1rem' }]}>
             {React.createElement(component, { style: [{ flexShrink: 1, minWidth: 0, width: 800, padding: '1rem' }, s.backgroundBodyColor, s.border, s.rounded ] })}
           </div>

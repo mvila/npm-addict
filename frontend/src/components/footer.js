@@ -8,7 +8,7 @@ export class Footer extends React.Component {
   render() {
     let separator = <span style={{ marginLeft: '0.5rem', marginRight: '0.5rem', color: this.theme.borderColor }}>|</span>;
     return (
-      <footer style={{ textAlign: 'center', fontSize: this.theme.smallFontSize }}>
+      <footer style={{ flexShrink: 0, textAlign: 'center', fontSize: this.theme.smallFontSize }}>
         <div>
           <a href={'#/feeds'}>RSS Feeds</a>
           {separator}
