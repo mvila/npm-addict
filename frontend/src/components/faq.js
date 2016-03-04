@@ -32,7 +32,7 @@ export class FAQ extends React.Component {
         <h5>What is the <code>reveal</code> property?</h5>
         <p>Simple, if you want your package to appear on npm addict (regardless of the number of GitHub stars it has), add the <code>reveal</code> property in your <code>package.json</code> file with a value set to <code>true</code>.</p>
         <p>If you don't want your package to be listed, you can opt-out by setting the property to <code>false</code>.</p>
-        <p>My hope about this <code>reveal</code> property is that it will be accepted by the JS community and can be used by other websites, including (let's dream) the official <a href='https://www.npmjs.com/'> npm site</a>!</p>
+        <p>My hope about this <code>reveal</code> property is that it will be accepted by the JS community and can be used by other websites, including (let's dream) the official <a href='https://www.npmjs.com/' target='_blank'> npm site</a>!</p>
       </div>
     );
   }

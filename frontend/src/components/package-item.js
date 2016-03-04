@@ -23,12 +23,12 @@ export class PackageItem extends React.Component {
     return (
       <li key='line' style={[{ marginBottom: '.5rem', wordWrap: 'break-word', ':hover': {} }]}>
         <div>
-          <a href={item.bestURL} style={[this.styles.bold]}>{item.name}</a>
+          <a href={item.bestURL} target='_blank' style={[this.styles.bold]}>{item.name}</a>
           {
             this.Radium.getState(this.state, 'line', ':hover') ?
             <span>
-              <a href={item.npmURL}><img key='npmLink' src='images/npm-logo-black.png' alt='npm' width='15' height='15' style={[{ marginLeft: 12 }, MINI_ICON_STYLE]} /></a>
-              <a href={item.gitHubURL}><img key='gitHubLink' src='images/github-logo-black.png' alt='GitHub' width='16' height='16' style={[{ marginLeft: 8 }, MINI_ICON_STYLE]} /></a>
+              <a href={item.npmURL} target='_blank'><img key='npmLink' src='images/npm-logo-black.png' alt='npm' width='15' height='15' style={[{ marginLeft: 12 }, MINI_ICON_STYLE]} /></a>
+              <a href={item.gitHubURL} target='_blank'><img key='gitHubLink' src='images/github-logo-black.png' alt='GitHub' width='16' height='16' style={[{ marginLeft: 8 }, MINI_ICON_STYLE]} /></a>
             </span> :
             null
           }
