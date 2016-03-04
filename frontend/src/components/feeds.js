@@ -18,7 +18,7 @@ export class Feeds extends React.Component {
 
     return (
       <div style={this.props.style}>
-        <h4>RSS Feeds</h4>
+        <h4>RSS feeds</h4>
 
         <hr />
 
