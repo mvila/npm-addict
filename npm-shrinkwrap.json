@@ -733,7 +733,14 @@
     "browserify": {
       "version": "13.0.0",
       "from": "browserify@>=13.0.0 <14.0.0",
-      "resolved": "https://registry.npmjs.org/browserify/-/browserify-13.0.0.tgz"
+      "resolved": "https://registry.npmjs.org/browserify/-/browserify-13.0.0.tgz",
+      "dependencies": {
+        "glob": {
+          "version": "5.0.15",
+          "from": "glob@>=5.0.15 <6.0.0",
+          "resolved": "https://registry.npmjs.org/glob/-/glob-5.0.15.tgz"
+        }
+      }
     },
     "browserify-aes": {
       "version": "1.0.6",
@@ -2179,11 +2186,6 @@
       "version": "2.2.1",
       "from": "github-url-to-object@>=2.1.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/github-url-to-object/-/github-url-to-object-2.2.1.tgz"
-    },
-    "glob": {
-      "version": "5.0.15",
-      "from": "glob@>=5.0.15 <6.0.0",
-      "resolved": "https://registry.npmjs.org/glob/-/glob-5.0.15.tgz"
     },
     "glob-base": {
       "version": "0.3.0",
