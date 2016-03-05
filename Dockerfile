@@ -1,4 +1,4 @@
-FROM node:4
+FROM node:5
 
 ENV NODE_ENV=production TERM=xterm
 
@@ -11,6 +11,6 @@ WORKDIR /home/npmaddict/npm-addict
 RUN chown --recursive npmaddict:npmaddict .
 USER npmaddict
 
-RUN npm install --no-spin
+RUN npm install --no-color --no-progress
 
 ENTRYPOINT ["npm", "start"]
