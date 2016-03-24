@@ -76,6 +76,7 @@
     "uglify-js": "^2.6.1",
     "universal-analytics": "^0.3.10",
     "universal-log": "^0.3.5",
+    "url-regex": "^3.1.0",
     "watchify": "^3.7.0"
   },
   "devDependencies": {

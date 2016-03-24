@@ -2,6 +2,7 @@
 
 import Twit from 'twit';
 import truncate from 'lodash/truncate';
+import urlRegex from 'url-regex';
 
 const MAX_LENGTH = 140;
 const CONFIGURATION_TTL = 24 * 60 * 60 * 1000; // 24 hours
@@ -63,6 +64,7 @@ export class Twitter {
   }
 
   format(text, url) {
+    text = text.replace(urlRegex(), '[...]'); // Remove URLs from the text to avoid an issue with Twitter automatic URL shortening.
     let maxLength = MAX_LENGTH;
     if (url) maxLength -= 1 + this.configuration.short_url_length_https;
     let status = truncate(text, { length: maxLength });
