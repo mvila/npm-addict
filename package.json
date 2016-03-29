@@ -3,6 +3,15 @@
   "displayName": "npm addict",
   "version": "0.9.12",
   "description": "Your daily injection of npm packages",
+  "keywords": [
+    "new",
+    "npm",
+    "packages",
+    "published",
+    "real time",
+    "tracker",
+    "list"
+  ],
   "author": "Manuel Vila <mvila@3base.com>",
   "license": "MIT",
   "reveal": false,
