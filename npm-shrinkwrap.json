@@ -3477,11 +3477,11 @@
     "radium-normalize": {
       "version": "2.0.0",
       "from": "radium-normalize@>=2.0.0 <3.0.0",
-      "resolved": "file:../radium-normalize"
+      "resolved": "https://registry.npmjs.org/radium-normalize/-/radium-normalize-2.0.0.tgz"
     },
     "radium-starter": {
       "version": "0.7.10",
-      "from": "radium-starter@0.7.10"
+      "from": "radium-starter@latest"
     },
     "randomatic": {
       "version": "1.1.5",
@@ -3584,8 +3584,7 @@
       "dependencies": {
         "balanced-match": {
           "version": "0.1.0",
-          "from": "balanced-match@>=0.1.0 <0.2.0",
-          "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-0.1.0.tgz"
+          "from": "balanced-match@>=0.1.0 <0.2.0"
         }
       }
     },
