@@ -35,7 +35,7 @@
     "watch": "node index.js build-and-start --watch"
   },
   "dependencies": {
-    "autotrack": "^0.6.3",
+    "autotrack": "^0.6.4",
     "babel-plugin-transform-async-to-generator": "^6.7.4",
     "babel-plugin-transform-class-properties": "^6.6.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
@@ -68,7 +68,7 @@
     "ncp": "^2.0.0",
     "node-watch": "^0.3.5",
     "object-layer": "^0.4.8",
-    "radium": "^0.17.0",
+    "radium": "^0.17.1",
     "radium-starter": "^0.7.10",
     "react": "^0.14.8",
     "react-dom": "^0.14.8",
