@@ -2781,6 +2781,16 @@
       "from": "lodash._pickbycallback@>=3.0.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/lodash._pickbycallback/-/lodash._pickbycallback-3.0.0.tgz"
     },
+    "lodash._root": {
+      "version": "3.0.1",
+      "from": "lodash._root@>=3.0.0 <3.1.0",
+      "resolved": "https://registry.npmjs.org/lodash._root/-/lodash._root-3.0.1.tgz"
+    },
+    "lodash._stack": {
+      "version": "4.1.1",
+      "from": "lodash._stack@>=4.1.0 <4.2.0",
+      "resolved": "https://registry.npmjs.org/lodash._stack/-/lodash._stack-4.1.1.tgz"
+    },
     "lodash.assign": {
       "version": "3.2.0",
       "from": "lodash.assign@>=3.0.0 <4.0.0",
@@ -2836,6 +2846,18 @@
       "version": "3.0.4",
       "from": "lodash.isarray@>=3.0.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/lodash.isarray/-/lodash.isarray-3.0.4.tgz"
+    },
+    "lodash.isequal": {
+      "version": "4.1.2",
+      "from": "lodash.isequal@>=4.1.2 <5.0.0",
+      "resolved": "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.1.2.tgz",
+      "dependencies": {
+        "lodash.keys": {
+          "version": "4.0.5",
+          "from": "lodash.keys@>=4.0.0 <5.0.0",
+          "resolved": "https://registry.npmjs.org/lodash.keys/-/lodash.keys-4.0.5.tgz"
+        }
+      }
     },
     "lodash.keys": {
       "version": "3.1.2",
@@ -3092,9 +3114,9 @@
       "resolved": "https://registry.npmjs.org/object-keys/-/object-keys-0.2.0.tgz"
     },
     "object-layer": {
-      "version": "0.4.8",
-      "from": "object-layer@0.4.8",
-      "resolved": "https://registry.npmjs.org/object-layer/-/object-layer-0.4.8.tgz"
+      "version": "0.5.0",
+      "from": "object-layer@latest",
+      "resolved": "https://registry.npmjs.org/object-layer/-/object-layer-0.5.0.tgz"
     },
     "object.omit": {
       "version": "2.0.0",
@@ -3774,9 +3796,9 @@
       "resolved": "https://registry.npmjs.org/to-fast-properties/-/to-fast-properties-1.0.2.tgz"
     },
     "top-model": {
-      "version": "0.1.20",
-      "from": "top-model@>=0.1.20 <0.2.0",
-      "resolved": "https://registry.npmjs.org/top-model/-/top-model-0.1.20.tgz"
+      "version": "0.1.22",
+      "from": "top-model@>=0.1.22 <0.2.0",
+      "resolved": "https://registry.npmjs.org/top-model/-/top-model-0.1.22.tgz"
     },
     "tough-cookie": {
       "version": "2.2.2",
