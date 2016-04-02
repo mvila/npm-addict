@@ -11,9 +11,9 @@ export class Fetcher {
   constructor(app) {
     this.app = app;
 
-    this.npmUpdatedPackagesURL = 'http://registry.npmjs.org/-/_view/browseUpdated?group_level=2';
+    this.npmUpdatedPackagesURL = 'https://registry.npmjs.org/-/_view/browseUpdated?group_level=2';
     this.npmWebsitePackageURL = 'https://www.npmjs.com/package/';
-    this.npmAPIPackageURL = 'http://registry.npmjs.org/';
+    this.npmAPIPackageURL = 'https://registry.npmjs.org/';
     this.gitHubAPIURL = 'https://api.github.com/';
     this.gitHubUsername = 'mvila';
     if (!process.env.GITHUB_PERSONAL_ACCESS_TOKEN) {
