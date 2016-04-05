@@ -64,8 +64,8 @@ export class Packages extends React.Component {
 
     return (
       <div style={this.props.style}>
-        <h4>New packages</h4>
-        <p style={[this.styles.hiddenIfSmall]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
+        <h4 style={{ marginBottom: '.7rem' }}>New packages</h4>
+        <p style={[this.styles.hideIfSmall]}>With at least 3 GitHub stars or the <code>reveal</code> property set to <code>true</code> in <code>package.json</code></p>
         <hr />
         {
           lists.map(list => <PackageList key={list.id} date={list.date} items={list.packages} />)
