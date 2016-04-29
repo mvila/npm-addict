@@ -107,7 +107,8 @@ export class Fetcher {
         this.app.log.warning(`'${name}' package doesn't have a creation date`);
         return undefined;
       }
-      if (createdOn < this.app.state.minimumCreationDate) {
+      let minimumDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 3 months
+      if (createdOn < minimumDate) {
         await this.app.store.IgnoredPackage.put({
           name,
           reason: 'CREATION_DATE_BEFORE_MINIMUM'

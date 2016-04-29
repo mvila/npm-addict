@@ -64,9 +64,9 @@ export class Package extends Model {
 
     let gitHubStars = this.getGitHubStars();
     if (gitHubStars == null) return false;
-    if (gitHubStars >= 3) return true;
+    if (gitHubStars >= this.context.minimumGitHubStars) return true;
     if (log) {
-      log.info(`'${this.name}' package has not enough stars (${gitHubStars} of 3)`);
+      log.info(`'${this.name}' package has not enough stars (${gitHubStars} of ${this.context.minimumGitHubStars})`);
     }
 
     return false;

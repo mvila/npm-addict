@@ -16,6 +16,8 @@ export class BaseApplication extends EventEmitterMixin() {
     this.version = version || pkg.version;
     this.projectName = pkg.name;
 
+    this.minimumGitHubStars = 5;
+
     this.environment = environment;
 
     let options = { appName: this.name, muteLevels: ['silence'] };
