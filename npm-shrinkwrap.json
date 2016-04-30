@@ -2189,6 +2189,11 @@
       "from": "has-ansi@>=2.0.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/has-ansi/-/has-ansi-2.0.0.tgz"
     },
+    "has-chinese": {
+      "version": "0.1.0",
+      "from": "has-chinese@latest",
+      "resolved": "https://registry.npmjs.org/has-chinese/-/has-chinese-0.1.0.tgz"
+    },
     "hash.js": {
       "version": "1.0.3",
       "from": "hash.js@>=1.0.0 <2.0.0",
@@ -2367,6 +2372,11 @@
       "version": "1.0.0",
       "from": "is-builtin-module@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-1.0.0.tgz"
+    },
+    "is-chinese": {
+      "version": "1.2.3",
+      "from": "is-chinese@>=1.2.3 <2.0.0",
+      "resolved": "https://registry.npmjs.org/is-chinese/-/is-chinese-1.2.3.tgz"
     },
     "is-dotfile": {
       "version": "1.0.2",
@@ -3702,6 +3712,11 @@
       "version": "1.0.1",
       "from": "string-width@>=1.0.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/string-width/-/string-width-1.0.1.tgz"
+    },
+    "string.prototype.codepointat": {
+      "version": "0.2.0",
+      "from": "string.prototype.codepointat@>=0.2.0 <0.3.0",
+      "resolved": "https://registry.npmjs.org/string.prototype.codepointat/-/string.prototype.codepointat-0.2.0.tgz"
     },
     "stringstream": {
       "version": "0.0.5",

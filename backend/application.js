@@ -92,6 +92,11 @@ class Application extends BackendApplication {
           result = await this.updateAll();
         }
         break;
+      case 'force':
+        name = this.argv._[1];
+        if (!name) throw new Error('Package name is missing');
+        result = await this.force(name);
+        break;
       case 'tweet':
         name = this.argv._[1];
         if (!name) throw new Error('Package name is missing');
@@ -225,6 +230,15 @@ class Application extends BackendApplication {
     for (let pkg of packages) {
       await this.fetcher.updatePackage(pkg.name);
     }
+  }
+
+  async force(name) {
+    let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
+    if (ignoredPackage) {
+      await ignoredPackage.delete();
+      console.log(`'${name}' IgnoredPackage item deleted`);
+    }
+    await this.fetcher.updatePackage(name, true);
   }
 
   async tweet(pkg) {

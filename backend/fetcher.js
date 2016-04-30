@@ -62,12 +62,13 @@ export class Fetcher {
     return { packages, lastDate };
   }
 
-  async updatePackage(name) {
+  async updatePackage(name, forced) {
     let pkg = await this.fetchPackage(name);
     if (!pkg) return;
     let item = await this.app.store.Package.getByName(name);
     if (!item) item = new this.app.store.Package();
     Object.assign(item, pkg);
+    if (forced) item.forced = true;
     let visible = item.determineVisibility(this.app.log);
     if (item.isNew && !visible) return;
     if (visible !== item.visible) {

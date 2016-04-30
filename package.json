@@ -52,6 +52,7 @@
     "easy-notifier": "^0.3.3",
     "event-emitter-mixin": "^0.3.4",
     "github-url-to-object": "^2.2.1",
+    "has-chinese": "^0.1.0",
     "idgen": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",
     "json-web-storage": "^1.0.7",
