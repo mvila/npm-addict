@@ -63,10 +63,10 @@ export class Fetcher {
   }
 
   async updatePackage(name, forced) {
-    let pkg = await this.fetchPackage(name);
-    if (!pkg) return;
     let item = await this.app.store.Package.getByName(name);
     if (!item) item = new this.app.store.Package();
+    let pkg = await this.fetchPackage(name, item.isNew);
+    if (!pkg) return;
     Object.assign(item, pkg);
     if (forced) item.forced = true;
     let visible = item.determineVisibility(this.app.log);
@@ -83,7 +83,7 @@ export class Fetcher {
     if (wasNew) await this.app.tweet(item);
   }
 
-  async fetchPackage(name) {
+  async fetchPackage(name, isNew) {
     try {
       let ignoredPackage = await this.app.store.IgnoredPackage.getByName(name);
       if (ignoredPackage) {
@@ -108,14 +108,17 @@ export class Fetcher {
         this.app.log.warning(`'${name}' package doesn't have a creation date`);
         return undefined;
       }
-      let minimumDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 3 months
-      if (createdOn < minimumDate) {
-        await this.app.store.IgnoredPackage.put({
-          name,
-          reason: 'CREATION_DATE_BEFORE_MINIMUM'
-        });
-        this.app.log.info(`'${name}' package has been marked as ignored (creation date: ${createdOn.toISOString()})`);
-        return undefined;
+
+      if (isNew) {
+        let minimumDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000); // 6 months
+        if (createdOn < minimumDate) {
+          await this.app.store.IgnoredPackage.put({
+            name,
+            reason: 'CREATION_DATE_BEFORE_MINIMUM'
+          });
+          this.app.log.info(`'${name}' package has been marked as ignored (creation date: ${createdOn.toISOString()})`);
+          return undefined;
+        }
       }
 
       let gitHubResult;

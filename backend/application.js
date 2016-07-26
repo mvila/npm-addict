@@ -45,7 +45,7 @@ class Application extends BackendApplication {
 
     let command = this.argv._[0];
     if (!command) throw new Error('Command is missing');
-    let name;
+    let name, issue;
     switch (command) {
       case 'start':
         let fetch = this.argv.fetch !== false;
@@ -101,6 +101,15 @@ class Application extends BackendApplication {
         name = this.argv._[1];
         if (!name) throw new Error('Package name is missing');
         result = await this.tweet(name);
+        break;
+      case 'fix':
+        issue = this.argv._[1];
+        if (!issue) throw new Error('Issue identifier is missing');
+        if (issue === 'incorrectly-ignored-packages') {
+          result = await this.fixIncorrectlyIgnoredPackages();
+        } else {
+          throw new Error('Unknown issue');
+        }
         break;
       default:
         throw new Error(`Unknown command '${command}'`);
@@ -252,6 +261,23 @@ class Application extends BackendApplication {
     }
     let text = pkg.name + ': ' + pkg.formattedDescription;
     await this.twitter.post(text, pkg.bestURL);
+  }
+
+  async fixIncorrectlyIgnoredPackages() {
+    let ignoredPackages = await this.store.IgnoredPackage.find({ order: 'name' });
+    for (let ignoredPackage of ignoredPackages) {
+      if (ignoredPackage.reason !== 'CREATION_DATE_BEFORE_MINIMUM') continue;
+      let name = ignoredPackage.name;
+      let pkg = await this.store.Package.getByName(name);
+      if (pkg) {
+        console.error(`'${name}' package has been incorrectly ignored`);
+        await ignoredPackage.delete();
+        console.log(`'${name}' IgnoredPackage item deleted`);
+        await this.fetcher.updatePackage(name);
+      } else {
+        console.error(`'${name}' package has been correctly ignored`);
+      }
+    }
   }
 }
 
