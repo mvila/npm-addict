@@ -88,7 +88,7 @@ export class Package extends Model {
       // to be listed on npm addict
       if (log) {
         log.info(`'${this.name}' package contains Chinese characters`);
-        this.context.notifier.notify(`'${this.name}' package contains Chinese characters (${this.npmURL})`);
+        // this.context.notifier.notify(`'${this.name}' package contains Chinese characters (${this.npmURL})`);
       }
       return false;
     }
