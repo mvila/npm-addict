@@ -53,7 +53,9 @@ export class Package extends Model {
     let reveal = this.getRevealProperty();
     if (reveal != null) {
       if (log) {
-        log.notice(`'${this.name}' package has a reveal property set to ${reveal ? 'true' : 'false'}`);
+        let message = `'${this.name}' package has a reveal property set to ${reveal ? 'true' : 'false'}`;
+        log.notice(message);
+        if (this.isNew && reveal) this.context.notifier.notify(message);
       }
       return reveal;
     }
