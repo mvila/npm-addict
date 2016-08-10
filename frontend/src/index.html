@@ -19,7 +19,9 @@
       if (window.NODE_ENV === 'production') {
         window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
         ga('create', '{googleAnalyticsTrackingId}', 'auto');
-        ga('require', 'autotrack');
+        ga('require', 'eventTracker');
+        ga('require', 'outboundLinkTracker');
+        ga('require', 'urlChangeTracker');
         ga('send', 'pageview');
       }
     </script>
