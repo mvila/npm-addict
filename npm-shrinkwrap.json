@@ -1,6 +1,6 @@
 {
   "name": "npm-addict",
-  "version": "0.9.18",
+  "version": "0.9.19",
   "dependencies": {
     "abbrev": {
       "version": "1.0.9",
