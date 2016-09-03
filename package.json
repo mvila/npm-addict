@@ -21,7 +21,7 @@
     "url": "git://github.com/mvila/npm-addict"
   },
   "scripts": {
-    "build": "node index.js build",
+    "build": "node frontend build",
     "deploy": "(git checkout --quiet master && test -z \"$(git status --porcelain)\" && git checkout $npm_config_target && git merge master --message \"Merge branch 'master' into '$npm_config_target'\" && git push && git checkout master) || echo \"An error occured (unclean repository?)\"",
     "deploy-production": "npm run deploy --target=production",
     "postinstall": "npm run build",
@@ -29,10 +29,10 @@
     "release-patch": "npm run release --release-type=patch",
     "release-minor": "npm run release --release-type=minor",
     "release-major": "npm run release --release-type=major",
-    "start": "node index.js start",
+    "start": "node backend start & node frontend start",
     "lint": "eslint .",
     "test": "echo \"Warning: no test specified\" && exit 0",
-    "watch": "node index.js build-and-start --watch"
+    "watch": "node frontend build --watch & nodemon --ignore frontend backend start --no-fetch & nodemon --ignore backend --ignore frontend/src --ignore frontend/dist frontend start"
   },
   "dependencies": {
     "autotrack": "^1.0.1",
@@ -86,9 +86,9 @@
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
-    "eslint": "^3.3.1",
+    "eslint": "^3.4.0",
     "eslint-config-next": "^0.1.12",
-    "eslint-plugin-react": "^6.1.2",
-    "node-dev": "^3.1.3"
+    "eslint-plugin-react": "^6.2.0",
+    "nodemon": "^1.10.2"
   }
 }
