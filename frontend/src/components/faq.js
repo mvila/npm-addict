@@ -27,12 +27,12 @@ export class FAQ extends React.Component {
 
         <h5>How packages are filtered?</h5>
         <p>A large majority of packages (more than 2 out of 3) are published in the npm registry when they are not ready to be unveiled. How to filter them? I believe it should be the responsibility of each author to indicate whether or not a package should be exposed to the community. Unfortunately, there is no official property in the <code>package.json</code> file to indicate that. We can define and agree on such a property and I am trying to push in this direction with the <code>reveal</code> property (see below).</p>
-        <p>Anyway,  the adoption will take time, so until then I filter the packages based on the number of GitHub stars. A minimum of {this.app.minimumGitHubStars} stars is required for a package to be referenced. I know it's not perfect, all packages are not hosted by GitHub, but it's a start.</p>
+        <p>Anyway,  the adoption will take time, so until then, I filter the packages based on the number of GitHub stars. A minimum of {this.app.minimumGitHubStars} stars is required for a package to be referenced. I know it's not perfect, all packages are not hosted by GitHub, but it's a start.</p>
 
         <h5>What is the <code>reveal</code> property?</h5>
         <p>Simple, if you want your package to appear on npm addict (regardless of the number of GitHub stars it has), add the <code>reveal</code> property in your <code>package.json</code> file with a value set to <code>true</code>.</p>
         <p>If you don't want your package to be listed, you can opt-out by setting the property to <code>false</code>.</p>
-        <p>My hope about this <code>reveal</code> property is that it will be accepted by the JS community and can be used by other websites, including (let's dream) the official <a href='https://www.npmjs.com/' target='_blank'> npm site</a>!</p>
+        <p>My hope for this <code>reveal</code> property is that it will be accepted by the JS community and can be used by other websites, including (let's dream) the official <a href='https://www.npmjs.com/' target='_blank'> npm site</a>!</p>
       </div>
     );
   }
