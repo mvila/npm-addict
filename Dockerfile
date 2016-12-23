@@ -1,4 +1,4 @@
-FROM node:6
+FROM kkarczmarczyk/node-yarn:6.9
 
 ENV NODE_ENV=production TERM=xterm
 
