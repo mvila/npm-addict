@@ -154,6 +154,8 @@ class Application extends BackendApplication {
 
     this.server.start();
 
+    this.notifier.notify(`${this.displayName} backend started (v${this.version})`);
+
     return 'KEEP_ALIVE';
   }
 
