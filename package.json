@@ -24,7 +24,7 @@
     "build": "node frontend build",
     "deploy": "git checkout production && git merge master --message \"Merge branch 'master' into 'production'\" && git push && git checkout master",
     "postinstall": "yarn run build",
-    "release": "git checkout --quiet master && yarn run lint && yarn version && git push --follow-tags && yarn publish",
+    "release": "git checkout --quiet master && yarn run lint && yarn publish && git push --follow-tags",
     "start": "node backend start & node frontend start",
     "lint": "eslint .",
     "test": "echo \"Warning: no test specified\" && exit 0",

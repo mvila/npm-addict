@@ -50,13 +50,13 @@ export class Feeder {
 
     let content = '';
     for (let pkg of packages) {
-      content += `<p>\n`;
+      content += '<p>\n';
       content += `<a href="${pkg.bestURL}">`;
       content += `${escape(pkg.name)}`;
       content += '</a>';
-      content += `<br>\n`;
+      content += '<br>\n';
       content += `${escape(pkg.formattedDescription)}\n`;
-      content += `</p>\n`;
+      content += '</p>\n';
     }
 
     let url = this.app.frontendURL + '#/days/' + moment.utc(start).format('YYYY-MM-DD');
