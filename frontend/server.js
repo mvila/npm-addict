@@ -16,8 +16,20 @@ export class Server {
     let root = new koa();
     root.name = this.app.name;
     root.proxy = true;
+
+    // curl -v http://dev.npmaddict.com:20576/health-check
+    root.use(async (ctx, next) => {
+      if (ctx.url === '/health-check') {
+        ctx.body = 'OK';
+      } else {
+        await next();
+      }
+    });
+
     root.use(convert(this.app.log.getLoggerMiddleware()));
+
     root.use(convert(rewrite('/', '/index.html')));
+
     let development = this.app.environment === 'development';
     root.use(convert(staticCache(this.path, {
       buffer: !development,

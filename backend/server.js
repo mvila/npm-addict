@@ -1,5 +1,6 @@
 'use strict';
 
+import assert from 'assert';
 import koa from 'koa';
 import convert from 'koa-convert';
 import cors from 'koa-cors';
@@ -62,6 +63,14 @@ export class Server {
     }
 
     router.use(createUAVisitor);
+
+    // curl -v http://api.dev.npmaddict.com:20576/v1/health-check
+    router.get('/health-check', async function(ctx) {
+      let count = await app.store.Package.count();
+      assert.ok(count > 0, 'There should be at least one package.');
+      ctx.logLevel = 'silence';
+      ctx.body = 'OK';
+    });
 
     router.get('/packages', async function(ctx) {
       let start = ctx.query.start;
