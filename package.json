@@ -67,7 +67,6 @@
     "mkdirp": "^0.5.1",
     "moment": "^2.14.1",
     "ncp": "^2.0.0",
-    "node-watch": "^0.4.0",
     "object-layer": "^0.5.2",
     "radium": "^0.18.1",
     "radium-starter": "^0.9.7",
@@ -81,14 +80,15 @@
     "uglify-js": "^2.7.3",
     "universal-analytics": "^0.4.2",
     "universal-log": "^0.3.9",
-    "url-regex": "^3.2.0",
-    "watchify": "^3.7.0"
+    "url-regex": "^3.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
     "eslint": "^3.4.0",
     "eslint-config-next": "^0.1.12",
     "eslint-plugin-react": "^6.2.0",
-    "nodemon": "^1.10.2"
+    "node-watch": "^0.4.0",
+    "nodemon": "^1.10.2",
+    "watchify": "^3.7.0"
   }
 }

@@ -5,13 +5,11 @@ import pathModule from 'path';
 import pick from 'lodash/pick';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
-import watch from 'node-watch';
 import denodeify from 'denodeify';
 import ncpModule from 'ncp';
 let ncp = denodeify(ncpModule.ncp);
 import UglifyJS from 'uglify-js';
 import browserify from 'browserify';
-import watchify from 'watchify';
 import babelify from 'babelify';
 
 export class Builder {
@@ -114,6 +112,7 @@ export class Builder {
   }
 
   async watchCSS() {
+    let watch = require('node-watch');
     let cssDir = pathModule.join(this.sourceDir, this.inputStylesDirname || '');
     let filenames = [];
     if (this.sassFilename) filenames.push(this.sassFilename);
@@ -162,6 +161,7 @@ export class Builder {
   }
 
   async watchStaticFiles() {
+    let watch = require('node-watch');
     let filePaths = this.staticFilePaths.map(path => {
       if (typeof path === 'object') path = path.src;
       return pathModule.join(this.sourceDir, path);
@@ -201,6 +201,10 @@ export class Builder {
   }
 
   async browserifyAppScript() {
+    let watchify;
+    if (this.watchMode) {
+      watchify = require('watchify');
+    }
     let inputDir = this.sourceDir;
     let inputPath = pathModule.join(inputDir, this.appScriptFilename);
     let opts = this.watchMode ? watchify.args : {};
