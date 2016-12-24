@@ -45,12 +45,15 @@ class Application extends BackendApplication {
 
     let command = this.argv._[0];
     if (!command) throw new Error('Command is missing');
-    let name, issue;
+    let name;
     switch (command) {
       case 'start':
         let fetch = this.argv.fetch;
         if (fetch == null) fetch = this.environment === 'production';
         result = await this.start({ fetch });
+        break;
+      case 'stats':
+        result = await this.stats();
         break;
       case 'show':
         name = this.argv._[1];
@@ -89,15 +92,6 @@ class Application extends BackendApplication {
         if (!name) throw new Error('Package name is missing');
         result = await this.tweet(name);
         break;
-      case 'fix':
-        issue = this.argv._[1];
-        if (!issue) throw new Error('Issue identifier is missing');
-        if (issue === 'incorrectly-ignored-packages') {
-          result = await this.fixIncorrectlyIgnoredPackages();
-        } else {
-          throw new Error('Unknown issue');
-        }
-        break;
       default:
         throw new Error(`Unknown command '${command}'`);
     }
@@ -114,6 +108,7 @@ class Application extends BackendApplication {
     }
 
     await this.upgradeToVersion2();
+    await this.upgradeToVersion3();
 
     this.twitter = new Twitter(this);
     this.fetcher = new Fetcher(this);
@@ -126,8 +121,7 @@ class Application extends BackendApplication {
 
     this.log.info('Upgrading backend data to version 2...');
 
-    let packages = await this.store.Package.find();
-    for (let pkg of packages) {
+    await this.store.Package.forEach({}, async (pkg) => {
       if (pkg.visible) {
         pkg.revealed = true;
         pkg.revealedOn = pkg.itemCreatedOn;
@@ -135,12 +129,29 @@ class Application extends BackendApplication {
       pkg.visible = undefined;
       pkg.forced = undefined;
       await pkg.save();
-    }
+    });
 
     this.state.version = 2;
     await this.state.save();
 
     this.log.info('Backend data upgraded to version 2');
+  }
+
+  async upgradeToVersion3() {
+    if (this.state.version >= 3) return;
+
+    this.log.info('Upgrading backend data to version 3...');
+
+    await this.store.IgnoredPackage.forEach({}, async (ignoredPackage) => {
+      if (ignoredPackage.reason === 'CREATION_DATE_BEFORE_MINIMUM') {
+        await ignoredPackage.delete();
+      }
+    });
+
+    this.state.version = 3;
+    await this.state.save();
+
+    this.log.info('Backend data upgraded to version 3');
   }
 
   async close() {
@@ -170,6 +181,16 @@ class Application extends BackendApplication {
     return 'KEEP_ALIVE';
   }
 
+  async stats() {
+    let count;
+    count = await this.store.Package.count();
+    console.log(`Packages: ${count}`);
+    count = await this.store.IgnoredPackage.count();
+    console.log(`Ignored packages: ${count}`);
+    count = await this.store.Post.count();
+    console.log(`Posts: ${count}`);
+  }
+
   async show(name) {
     let pkg = await this.store.Package.getByName(name);
     if (!pkg) {
@@ -180,10 +201,9 @@ class Application extends BackendApplication {
   }
 
   async showIgnored() {
-    let packages = await this.store.IgnoredPackage.find({ order: 'name' });
-    for (let pkg of packages) {
+    await this.store.IgnoredPackage.forEach({}, (pkg) => {
       console.log(`${pkg.name} (${pkg.reason})`);
-    }
+    });
   }
 
   async delete(name) {
@@ -222,10 +242,9 @@ class Application extends BackendApplication {
   }
 
   async updateAll() {
-    let packages = await this.store.Package.find();
-    for (let pkg of packages) {
+    await this.store.Package.forEach({}, async (pkg) => {
       await this.fetcher.updatePackage(pkg.name);
-    }
+    });
   }
 
   async tweet(pkg) {
@@ -239,23 +258,6 @@ class Application extends BackendApplication {
     }
     let text = pkg.name + ': ' + pkg.formattedDescription;
     await this.twitter.post(text, pkg.bestURL);
-  }
-
-  async fixIncorrectlyIgnoredPackages() {
-    let ignoredPackages = await this.store.IgnoredPackage.find({ order: 'name' });
-    for (let ignoredPackage of ignoredPackages) {
-      if (ignoredPackage.reason !== 'CREATION_DATE_BEFORE_MINIMUM') continue;
-      let name = ignoredPackage.name;
-      let pkg = await this.store.Package.getByName(name);
-      if (pkg) {
-        console.error(`'${name}' package has been incorrectly ignored`);
-        await ignoredPackage.delete();
-        console.log(`'${name}' IgnoredPackage item deleted`);
-        await this.fetcher.updatePackage(name);
-      } else {
-        console.error(`'${name}' package has been correctly ignored`);
-      }
-    }
   }
 }
 
