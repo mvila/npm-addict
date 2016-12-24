@@ -50,6 +50,14 @@ export class Package extends Model {
       return false;
     }
 
+    let verification = this.verifyGitHubRepositoryOwnership();
+    if (verification === false) {
+      if (log) {
+        log.info(`'${this.name}' package has a GitHub repository but the ownership verification failed`);
+      }
+      return false;
+    }
+
     let reveal = this.getRevealProperty();
     if (reveal != null) {
       if (log) {
@@ -58,14 +66,6 @@ export class Package extends Model {
         if (this.isNew && reveal) this.context.notifier.notify(message);
       }
       return reveal;
-    }
-
-    let verification = this.verifyGitHubRepositoryOwnership();
-    if (verification === false) {
-      if (log) {
-        log.info(`'${this.name}' package has a GitHub repository but the ownership verification failed`);
-      }
-      return false;
     }
 
     let gitHubStars = this.getGitHubStars();
