@@ -62,28 +62,31 @@ export class Fetcher {
     return { packages, lastDate };
   }
 
-  async updatePackage(name, forced) {
+  async updatePackage(name) {
     let item = await this.app.store.Package.getByName(name);
     if (!item) item = new this.app.store.Package();
-    let pkg = await this.fetchPackage(name, item.isNew);
+    let pkg = await this.fetchPackage(name);
     if (!pkg) return;
     Object.assign(item, pkg);
-    if (forced) item.forced = true;
-    let visible = item.determineVisibility(this.app.log);
-    if (item.isNew && !visible) return;
-    if (visible !== item.visible) {
-      if (!item.isNew) {
-        this.app.log.info(`'${name}' package visibility changed to ${visible ? 'visible' : 'invisible'}`);
+    let hasBeenRevealed = false;
+    if (!item.revealed) {
+      let revealed = item.determineRevealed();
+      if (revealed) {
+        item.revealed = true;
+        item.revealedOn = new Date();
+        hasBeenRevealed = true;
       }
-      item.visible = visible;
     }
     let wasNew = item.isNew;
     await item.save();
-    this.app.log.info(`'${name}' package ${wasNew ? 'created' : 'updated'}`);
-    if (wasNew) await this.app.tweet(item);
+    this.app.log.info(`'${name}' package ${wasNew ? 'added' : 'updated'}`);
+    if (hasBeenRevealed) {
+      this.app.log.info(`'${name}' package revealed`);
+      await this.app.tweet(item);
+    }
   }
 
-  async fetchPackage(name, isNew) {
+  async fetchPackage(name) {
     try {
       let ignoredPackage = await this.app.store.IgnoredPackage.getByName(name);
       if (ignoredPackage) {
@@ -103,23 +106,6 @@ export class Fetcher {
 
       let createdOn = npmResult.time && npmResult.time.created && new Date(npmResult.time.created);
       let updatedOn = npmResult.time && npmResult.time.modified && new Date(npmResult.time.modified);
-
-      if (!createdOn) {
-        this.app.log.warning(`'${name}' package doesn't have a creation date`);
-        return undefined;
-      }
-
-      if (isNew) {
-        let minimumDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000); // 6 months
-        if (createdOn < minimumDate) {
-          await this.app.store.IgnoredPackage.put({
-            name,
-            reason: 'CREATION_DATE_BEFORE_MINIMUM'
-          });
-          this.app.log.info(`'${name}' package has been marked as ignored (creation date: ${createdOn.toISOString()})`);
-          return undefined;
-        }
-      }
 
       let gitHubResult;
       let parsedGitHubURL;

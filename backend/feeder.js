@@ -35,8 +35,8 @@ export class Feeder {
     let start = date;
     let endBefore = moment(date).add(1, 'days').toDate();
     let packages = await this.app.store.Package.find({
-      query: { visible: true },
-      order: 'itemCreatedOn',
+      query: { revealed: true },
+      order: 'revealedOn',
       start: start.toJSON(),
       endBefore: endBefore.toJSON()
     });

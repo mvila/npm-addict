@@ -9,10 +9,12 @@ export class Package extends Model {
   @field(String) description;
   @field(String) npmURL;
   @field(String) gitHubURL;
-  @field(Boolean) visible;
-  @field(Boolean) forced;
   @field(Date, { validators: 'filled' }) createdOn;
   @field(Date, { validators: 'filled' }) updatedOn;
+  @field(Boolean) visible; // DEPRECATED
+  @field(Boolean) forced; // DEPRECATED
+  @field(Boolean) revealed;
+  @field(Date) revealedOn;
   @field(Object) npmResult;
   @field(Object) gitHubResult;
   @field(Object) gitHubPackageJSON;
@@ -40,58 +42,59 @@ export class Package extends Model {
     return this.gitHubURL || this.npmURL;
   }
 
-  determineVisibility(log) {
-    if (this.forced) return true;
+  determineRevealed() {
+    let log = this.context.log;
+    let notifier = this.context.notifier;
+
+    if (!this.createdOn) {
+      log.info(`'${this.name}' package doesn't have a creation date`);
+      return false;
+    }
+
+    let minimumDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000); // 6 months
+    // let minimumDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000); // 3 days
+    if (this.createdOn < minimumDate) {
+      log.info(`'${this.name}' package was created too long ago (creation date: ${this.createdOn.toISOString()})`);
+      return false;
+    }
 
     if (!this.description) {
-      if (log) {
-        log.info(`'${this.name}' package doesn't have a description`);
-      }
+      log.info(`'${this.name}' package doesn't have a description`);
       return false;
     }
 
     let verification = this.verifyGitHubRepositoryOwnership();
     if (verification === false) {
-      if (log) {
-        log.info(`'${this.name}' package has a GitHub repository but the ownership verification failed`);
-      }
+      log.info(`'${this.name}' package has a GitHub repository but the ownership verification failed`);
       return false;
     }
 
     let reveal = this.getRevealProperty();
     if (reveal != null) {
-      if (log) {
-        let message = `'${this.name}' package has a reveal property set to ${reveal ? 'true' : 'false'}`;
-        log.notice(message);
-        if (this.isNew && reveal) this.context.notifier.notify(message);
-      }
+      let message = `'${this.name}' package has a reveal property set to ${reveal ? 'true' : 'false'}`;
+      log.notice(message);
+      notifier.notify(message);
       return reveal;
     }
 
     let gitHubStars = this.getGitHubStars();
     if (gitHubStars == null) return false;
     if (gitHubStars < this.context.minimumGitHubStars) {
-      if (log) {
-        log.info(`'${this.name}' package has not enough stars (${gitHubStars} of ${this.context.minimumGitHubStars})`);
-      }
+      log.info(`'${this.name}' package has not enough stars (${gitHubStars} of ${this.context.minimumGitHubStars})`);
       return false;
     }
 
     let readme = this.npmResult.readme;
     if (!readme) {
-      if (log) {
-        log.info(`'${this.name}' package doesn't have a README`);
-      }
+      log.info(`'${this.name}' package doesn't have a README`);
       return false;
     }
 
     if (hasChinese(readme)) {
       // I am very sorry Chinese guys, you must document your package in English
       // to be listed on npm addict
-      if (log) {
-        log.info(`'${this.name}' package contains Chinese characters`);
-        // this.context.notifier.notify(`'${this.name}' package contains Chinese characters (${this.npmURL})`);
-      }
+      log.info(`'${this.name}' package contains Chinese characters`);
+      // notifier.notify(`'${this.name}' package contains Chinese characters (${this.npmURL})`);
       return false;
     }
 

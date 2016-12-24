@@ -26,6 +26,7 @@
     "postinstall": "yarn run build",
     "release": "git checkout --quiet master && yarn run lint && yarn version && git push --follow-tags && npm publish",
     "start": "node backend start & node frontend start",
+    "start-and-fetch": "node backend start --fetch & node frontend start",
     "lint": "eslint .",
     "test": "echo \"Warning: no test specified\" && exit 0",
     "watch": "node frontend build --watch & nodemon --ignore frontend backend start --no-fetch & nodemon --ignore backend --ignore frontend/src --ignore frontend/dist frontend start"

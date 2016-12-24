@@ -48,15 +48,14 @@ class Application extends BackendApplication {
     let name, issue;
     switch (command) {
       case 'start':
-        let fetch = this.argv.fetch !== false;
+        let fetch = this.argv.fetch;
+        if (fetch == null) fetch = this.environment === 'production';
         result = await this.start({ fetch });
         break;
       case 'show':
         name = this.argv._[1];
         if (name) {
           result = await this.show(name);
-        } else if (this.argv.invisible) {
-          result = await this.showInvisible();
         } else if (this.argv.ignored) {
           result = await this.showIgnored();
         } else {
@@ -67,8 +66,6 @@ class Application extends BackendApplication {
         name = this.argv._[1];
         if (name) {
           result = await this.delete(name);
-        } else if (this.argv.invisible) {
-          result = await this.deleteInvisible();
         } else {
           throw new Error('A parameter is missing');
         }
@@ -78,11 +75,6 @@ class Application extends BackendApplication {
         if (!name) throw new Error('Package name is missing');
         result = await this.ignore(name);
         break;
-      case 'verify':
-        name = this.argv._[1];
-        if (!name) throw new Error('Package name is missing');
-        result = await this.verify(name);
-        break;
       case 'update':
         name = this.argv._[1];
         if (name) {
@@ -91,11 +83,6 @@ class Application extends BackendApplication {
           if (!this.argv.all) throw new Error('Package name or --all option is missing');
           result = await this.updateAll();
         }
-        break;
-      case 'force':
-        name = this.argv._[1];
-        if (!name) throw new Error('Package name is missing');
-        result = await this.force(name);
         break;
       case 'tweet':
         name = this.argv._[1];
@@ -126,10 +113,34 @@ class Application extends BackendApplication {
       this.state = new this.store.BackendState();
     }
 
+    await this.upgradeToVersion2();
+
     this.twitter = new Twitter(this);
     this.fetcher = new Fetcher(this);
     this.feeder = new Feeder(this);
     this.server = new Server(this, { port: this.port });
+  }
+
+  async upgradeToVersion2() {
+    if (this.state.version >= 2) return;
+
+    this.log.info('Upgrading backend data to version 2...');
+
+    let packages = await this.store.Package.find();
+    for (let pkg of packages) {
+      if (pkg.visible) {
+        pkg.revealed = true;
+        pkg.revealedOn = pkg.itemCreatedOn;
+      }
+      pkg.visible = undefined;
+      pkg.forced = undefined;
+      await pkg.save();
+    }
+
+    this.state.version = 2;
+    await this.state.save();
+
+    this.log.info('Backend data upgraded to version 2');
   }
 
   async close() {
@@ -168,16 +179,6 @@ class Application extends BackendApplication {
     console.log(util.inspect(pkg, { depth: null, colors: true }));
   }
 
-  async showInvisible() {
-    let packages = await this.store.Package.find({
-      query: { visible: false },
-      order: 'itemCreatedOn'
-    });
-    for (let pkg of packages) {
-      console.log(pkg.name);
-    }
-  }
-
   async showIgnored() {
     let packages = await this.store.IgnoredPackage.find({ order: 'name' });
     for (let pkg of packages) {
@@ -198,14 +199,6 @@ class Application extends BackendApplication {
     }
   }
 
-  async deleteInvisible() {
-    throw new Error('This command should not be used anymore');
-    // let packages = await this.store.Package.find({ query: { visible: false }, order: 'itemCreatedOn' });
-    // for (let pkg of packages) {
-    //   await this.delete(pkg.name);
-    // }
-  }
-
   async ignore(name) {
     let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
     if (ignoredPackage) {
@@ -224,14 +217,6 @@ class Application extends BackendApplication {
     console.log(`'${name}' package has been manually marked as ignored`);
   }
 
-  async verify(name) {
-    let pkg = await this.fetcher.fetchPackage(name);
-    if (!pkg) return;
-    let item = new this.store.Package(pkg);
-    let visible = item.determineVisibility(this.log);
-    console.log(`'${name}' package visibility is: ${visible}`);
-  }
-
   async update(name) {
     await this.fetcher.updatePackage(name);
   }
@@ -241,15 +226,6 @@ class Application extends BackendApplication {
     for (let pkg of packages) {
       await this.fetcher.updatePackage(pkg.name);
     }
-  }
-
-  async force(name) {
-    let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
-    if (ignoredPackage) {
-      await ignoredPackage.delete();
-      console.log(`'${name}' IgnoredPackage item deleted`);
-    }
-    await this.fetcher.updatePackage(name, true);
   }
 
   async tweet(pkg) {

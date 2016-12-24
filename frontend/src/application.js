@@ -92,7 +92,7 @@ class Application extends FrontendApplication {
     let query = { limit: PACKAGES_PER_PAGE + 1 };
     if (this.packages.length) {
       let lastPackage = this.packages[this.packages.length - 1];
-      query.startAfter = lastPackage.itemCreatedOn.toJSON();
+      query.startAfter = lastPackage.revealedOn.toJSON();
     } else if (this.currentDate) {
       query.start = this.currentDate.toJSON();
     }

@@ -9,7 +9,7 @@ import { Post } from '../models/post';
 export class Store extends LocalStore {
   @model(BackendState) BackendState;
   @model(Package, {
-    indexes: ['name', ['visible', 'itemCreatedOn']]
+    indexes: ['name', ['revealed', 'revealedOn']]
   }) Package;
   @model(IgnoredPackage, { indexes: ['name'] }) IgnoredPackage;
   @model(Post, { indexes: ['createdOn'] }) Post;

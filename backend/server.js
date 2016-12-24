@@ -84,8 +84,8 @@ export class Server {
       }
 
       let options = {
-        query: { visible: true },
-        order: 'itemCreatedOn',
+        query: { revealed: true },
+        order: 'revealedOn',
         reverse,
         limit
       };
@@ -98,7 +98,7 @@ export class Server {
 
       let results = packages.map(function(pkg) {
         return pick(pkg, [
-          'id', 'name', 'description', 'npmURL', 'gitHubURL', 'itemCreatedOn'
+          'id', 'name', 'description', 'npmURL', 'gitHubURL', 'revealedOn'
         ]);
       });
 
@@ -141,8 +141,8 @@ export class Server {
 
     router.get('/feeds/real-time', async function(ctx) {
       let packages = await app.store.Package.find({
-        query: { visible: true },
-        order: 'itemCreatedOn',
+        query: { revealed: true },
+        order: 'revealedOn',
         reverse: true,
         limit: 100
       });
@@ -159,7 +159,7 @@ export class Server {
           title: pkg.name,
           description: pkg.formattedDescription,
           url: pkg.bestURL,
-          date: pkg.itemCreatedOn,
+          date: pkg.revealedOn,
           guid: pkg.id
         });
       }

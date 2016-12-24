@@ -4,6 +4,7 @@ import { Model, primaryKey, field, createdOn, updatedOn } from 'object-layer/lib
 
 export class BackendState extends Model {
   @primaryKey(String, { defaultValue: 'BackendState' }) id;
+  @field(Number, { defaultValue: 1 }) version;
   @field(Date, {
     defaultValue: () => new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours
   }) lastModificationDate;
