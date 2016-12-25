@@ -257,7 +257,11 @@ class Application extends BackendApplication {
       }
     }
     let text = pkg.name + ': ' + pkg.formattedDescription;
-    await this.twitter.post(text, pkg.bestURL);
+    try {
+      await this.twitter.post(text, pkg.bestURL);
+    } catch (err) {
+      this.app.log.warning(`An error occured while tweeting '${pkg.name}' package`);
+    }
   }
 }
 
