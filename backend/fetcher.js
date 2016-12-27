@@ -1,7 +1,7 @@
 'use strict';
 
 import fetch from 'isomorphic-fetch';
-import sleep from 'sleep-promise';
+import ChangesStream from 'changes-stream';
 import Package from 'nice-package';
 import parseGitHubURL from 'github-url-to-object';
 import pThrottle from 'p-throttle';
@@ -13,7 +13,7 @@ export class Fetcher {
   constructor(app) {
     this.app = app;
 
-    this.npmUpdatedPackagesURL = 'https://registry.npmjs.org/-/_view/browseUpdated?group_level=2';
+    this.npmRegistryURL = 'https://replicate.npmjs.com/registry';
     this.npmWebsitePackageURL = 'https://www.npmjs.com/package/';
     this.npmAPIPackageURL = 'https://registry.npmjs.org/';
 
@@ -27,54 +27,57 @@ export class Fetcher {
   }
 
   async run() {
-    while (true) {
-      let startDate = new Date(this.app.state.lastModificationDate.valueOf() + 1);
-      let result = await this.findUpdatedPackages(startDate);
-      this.app.log.notice(`${result.packages.length} updated packages found in npm registry`);
-      for (let name of result.packages) {
-        await this.updatePackage(name);
+    if (this.app.state.lastRegistryUpdateSeq == null) {
+      this.app.log.info('Fetching \'lastRegistryUpdateSeq\' from npm registry');
+      let url = this.npmRegistryURL;
+      let response = await fetch(url, { timeout: FETCH_TIMEOUT });
+      if (response.status !== 200) {
+        throw new Error(`Bad response from npm registry while getting the last 'update_seq' (HTTP status: ${response.status})`);
       }
-      if (result.lastDate) {
-        this.app.state.lastModificationDate = result.lastDate;
-      }
-      this.app.state.lastFetchDate = new Date();
+      let result = await response.json();
+      this.app.state.lastRegistryUpdateSeq = result.update_seq;
       await this.app.state.save();
-      await sleep(5 * 60 * 1000); // 5 minutes
+      this.app.log.info(`'lastRegistryUpdateSeq' setted to ${this.app.state.lastRegistryUpdateSeq}`);
     }
+
+    this.app.log.info(`Listening registry changes (lastRegistryUpdateSeq: ${this.app.state.lastRegistryUpdateSeq})`);
+
+    let changes = new ChangesStream({
+      db: this.npmRegistryURL,
+      since: this.app.state.lastRegistryUpdateSeq,
+      'include_docs': true
+    });
+
+    changes.on('readable', async () => {
+      let change = changes.read();
+      changes.pause();
+      try {
+        this.app.log.trace(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
+        if (change.deleted) {
+          await this.deletePackage(change.id);
+        } else {
+          let pkg = await this.createOrUpdatePackage(change.id, change.doc);
+          if (pkg && (this.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
+            this.app.state.lastUpdateDate = pkg.updatedOn;
+          }
+        }
+        this.app.state.lastRegistryUpdateSeq = change.seq;
+        await this.app.state.save();
+      } finally {
+        changes.resume();
+      }
+    });
   }
 
   close() {
     this.requestGitHubAPI.abort();
   }
 
-  async findUpdatedPackages(startDate) {
-    let packages = [];
-    let lastDate;
-    try {
-      let startKey = [startDate];
-      let url = this.npmUpdatedPackagesURL;
-      url += '&startkey=' + encodeURIComponent(JSON.stringify(startKey));
-      let response = await fetch(url, { timeout: FETCH_TIMEOUT });
-      if (response.status !== 200) {
-        throw new Error(`Bad response from npm registry while fetching updated packages (HTTP status: ${response.status})`);
-      }
-      let result = await response.json();
-      let rows = result.rows;
-      for (let row of rows) {
-        packages.push(row.key[1]);
-        lastDate = new Date(row.key[0]);
-      }
-    } catch (err) {
-      this.app.log.warning(`An error occured while fetching updated packages from npm registry (${err.message})`);
-    }
-    return { packages, lastDate };
-  }
-
-  async updatePackage(name) {
+  async createOrUpdatePackage(name, prefetchedNPMResult) {
     let item = await this.app.store.Package.getByName(name);
     if (!item) item = new this.app.store.Package();
-    let pkg = await this.fetchPackage(name);
-    if (!pkg) return;
+    let pkg = await this.fetchPackage(name, prefetchedNPMResult);
+    if (!pkg) return undefined;
     Object.assign(item, pkg);
     let hasBeenRevealed = false;
     if (!item.revealed) {
@@ -92,9 +95,17 @@ export class Fetcher {
       this.app.log.info(`'${name}' package revealed`);
       await this.app.tweet(item);
     }
+    return item;
   }
 
-  async fetchPackage(name) {
+  async deletePackage(name) {
+    let item = await this.app.store.Package.getByName(name);
+    if (!item) return;
+    await item.delete();
+    this.app.log.info(`'${name}' package deleted`);
+  }
+
+  async fetchPackage(name, prefetchedNPMResult) {
     try {
       let ignoredPackage = await this.app.store.IgnoredPackage.getByName(name);
       if (ignoredPackage) {
@@ -102,16 +113,22 @@ export class Fetcher {
         return undefined;
       }
 
-      let npmURL = this.npmWebsitePackageURL + name;
-
-      let url = this.npmAPIPackageURL + name.replace('/', '%2F');
-      let response = await fetch(url, { timeout: FETCH_TIMEOUT });
-      if (response.status !== 200) {
-        this.app.log.warning(`Bad response from npm registry while fetching '${name}' package (HTTP status: ${response.status})`);
-        return undefined;
+      let npmResult = prefetchedNPMResult;
+      if (!npmResult) {
+        let url = this.npmAPIPackageURL + name.replace('/', '%2F');
+        let response = await fetch(url, { timeout: FETCH_TIMEOUT });
+        if (response.status !== 200) {
+          this.app.log.warning(`Bad response from npm registry while fetching '${name}' package (HTTP status: ${response.status})`);
+          return undefined;
+        }
+        npmResult = await response.json();
       }
-      let npmResult = await response.json();
+
       npmResult = new Package(npmResult);
+      // I think this should be handled by nice-package:
+      if (npmResult.repository && typeof npmResult.repository !== 'string') {
+        npmResult.repository = npmResult.repository.url;
+      }
 
       if (npmResult.name !== name) {
         this.app.log.warning(`Fetching '${name}' package returned a package with a different name (${npmResult.name})`);
@@ -140,6 +157,8 @@ export class Fetcher {
       let reveal = npmResult.reveal;
       let createdOn = new Date(npmResult.created);
       let updatedOn = new Date(npmResult.modified);
+
+      let npmURL = this.npmWebsitePackageURL + name;
 
       let gitHubResult, parsedGitHubURL, gitHubURL;
       if (npmResult.repository) {

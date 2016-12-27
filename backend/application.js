@@ -239,12 +239,12 @@ class Application extends BackendApplication {
   }
 
   async update(name) {
-    await this.fetcher.updatePackage(name);
+    await this.fetcher.createOrUpdatePackage(name);
   }
 
   async updateAll() {
     await this.store.Package.forEach({}, async (pkg) => {
-      await this.fetcher.updatePackage(pkg.name);
+      await this.fetcher.createOrUpdatePackage(pkg.name);
     });
   }
 

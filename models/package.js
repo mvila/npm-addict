@@ -58,8 +58,12 @@ export class Package extends Model {
       return false;
     }
 
-    let minimumDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000); // 6 months
-    // let minimumDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000); // 3 days
+    let minimumDate;
+    if (this.name.startsWith('@')) { // Temporary measure to limit the number of new scoped packages
+      minimumDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 1 month
+    } else {
+      minimumDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000); // 1 year
+    }
     if (this.createdOn < minimumDate) {
       log.info(`'${this.name}' package was created too long ago (creation date: ${this.createdOn.toISOString()})`);
       return false;

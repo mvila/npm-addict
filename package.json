@@ -44,6 +44,7 @@
     "babelify": "^7.3.0",
     "better-node-env": "^1.0.3",
     "browserify": "^13.1.1",
+    "changes-stream": "^2.2.0",
     "denodeify": "^1.2.1",
     "easy-aws": "^0.4.3",
     "easy-notifier": "^0.3.4",

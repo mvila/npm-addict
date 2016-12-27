@@ -14,9 +14,9 @@ export class Feeder {
   async run() {
     while (true) {
       await sleep(SLEEP_TIME);
-      if (!this.app.state.lastFetchDate) continue;
+      if (!this.app.state.lastUpdateDate) continue;
       let todayDate = moment.utc().startOf('day').toDate();
-      if (this.app.state.lastFetchDate < todayDate) continue;
+      if (this.app.state.lastUpdateDate < todayDate) continue;
       let yesterdayDate = moment(todayDate).subtract(1, 'days').toDate();
       let lastDate = this.app.state.lastDailyFeedPostDate;
       if (!lastDate) lastDate = moment(yesterdayDate).subtract(3, 'days').toDate();
