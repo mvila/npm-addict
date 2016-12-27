@@ -7,17 +7,24 @@ export class Package extends Model {
   @primaryKey() id;
   @field(String, { validators: 'filled' }) name;
   @field(String) description;
-  @field(String) npmURL;
-  @field(String) gitHubURL;
+  @field(Array) keywords;
+  @field(String) readme;
+  @field(String) version;
+  @field(Object) lastPublisher;
+  @field(String) license;
+  @field(Boolean) reveal;
   @field(Date, { validators: 'filled' }) createdOn;
   @field(Date, { validators: 'filled' }) updatedOn;
+  @field(String) npmURL;
+  @field(String) gitHubURL;
+  @field(Number) gitHubStars;
+  @field(Object) gitHubPackageJSON;
   @field(Boolean) visible; // DEPRECATED
   @field(Boolean) forced; // DEPRECATED
   @field(Boolean) revealed;
   @field(Date) revealedOn;
   @field(Object) npmResult;
   @field(Object) gitHubResult;
-  @field(Object) gitHubPackageJSON;
   @createdOn() itemCreatedOn;
   @updatedOn() itemUpdatedOn;
 
@@ -69,18 +76,16 @@ export class Package extends Model {
       return false;
     }
 
-    let reveal = this.getRevealProperty();
-    if (reveal != null) {
-      let message = `'${this.name}' package has a reveal property set to ${reveal ? 'true' : 'false'}`;
+    if (this.reveal != null) {
+      let message = `'${this.name}' package has a reveal property set to ${this.reveal ? 'true' : 'false'}`;
       log.notice(message);
       notifier.notify(message);
-      return reveal;
+      return this.reveal;
     }
 
-    let gitHubStars = this.getGitHubStars();
-    if (gitHubStars == null) return false;
-    if (gitHubStars < this.context.minimumGitHubStars) {
-      log.info(`'${this.name}' package has not enough stars (${gitHubStars} of ${this.context.minimumGitHubStars})`);
+    if (this.gitHubStars == null) return false;
+    if (this.gitHubStars < this.context.minimumGitHubStars) {
+      log.info(`'${this.name}' package has not enough stars (${this.gitHubStars} of ${this.context.minimumGitHubStars})`);
       return false;
     }
 
@@ -99,19 +104,6 @@ export class Package extends Model {
     }
 
     return true;
-  }
-
-  getRevealProperty() {
-    let pkg = this.npmResult;
-    let latestVersion = pkg['dist-tags'] && pkg['dist-tags'].latest;
-    if (!latestVersion) return undefined;
-    pkg = pkg.versions && pkg.versions[latestVersion];
-    if (!pkg) return undefined;
-    return pkg.reveal;
-  }
-
-  getGitHubStars() {
-    return this.gitHubResult && this.gitHubResult.stargazers_count;
   }
 
   verifyGitHubRepositoryOwnership() {

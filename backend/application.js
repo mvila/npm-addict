@@ -155,6 +155,7 @@ class Application extends BackendApplication {
   }
 
   async close() {
+    await this.fetcher.close();
     await this.twitter.close();
     await this.store.close();
   }
