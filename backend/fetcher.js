@@ -95,12 +95,13 @@ export class Fetcher {
           }
           changes.pause();
           try {
-            this.app.log.trace(`Refetching package '${change.id}' (seq: ${change.seq})`);
+            this.app.log.info(`Refetching package '${change.id}' (seq: ${change.seq})`);
             if (change.deleted) {
               await this.deletePackage(change.id);
             } else {
               await this.createOrUpdatePackage(change.id, change.doc);
             }
+            await sleep(1500); // We don't want to exaust GitHub API rate limit
           } finally {
             changes.resume();
           }
