@@ -24,18 +24,22 @@ export class BackendApplication extends BaseApplication {
     };
 
     if (this.environment !== 'development') {
-      if (this.awsConfig.accessKeyId && this.awsConfig.secretAccessKey && this.awsConfig.region) {
-        let cloudWatchLogs = new CloudWatchLogs(this.awsConfig);
-        this.log.addOutput(new AWSCloudWatchLogsOutput(cloudWatchLogs));
+      if (this.argv['aws-cloud-watch-logs'] !== false) {
+        if (this.awsConfig.accessKeyId && this.awsConfig.secretAccessKey && this.awsConfig.region) {
+          let cloudWatchLogs = new CloudWatchLogs(this.awsConfig);
+          this.log.addOutput(new AWSCloudWatchLogsOutput(cloudWatchLogs));
+        }
       }
     }
 
     if (this.environment !== 'development') {
-      let url = process.env.SLACK_INCOMING_WEBHOOK_URL;
-      let channel = process.env.SLACK_INCOMING_WEBHOOK_CHANNEL;
-      if (url && channel) {
-        let target = new SlackIncomingWebhookTarget(url, { channel });
-        this.notifier.addTarget(target);
+      if (this.argv['slack-notifications'] !== false) {
+        let url = process.env.SLACK_INCOMING_WEBHOOK_URL;
+        let channel = process.env.SLACK_INCOMING_WEBHOOK_CHANNEL;
+        if (url && channel) {
+          let target = new SlackIncomingWebhookTarget(url, { channel });
+          this.notifier.addTarget(target);
+        }
       }
     }
   }

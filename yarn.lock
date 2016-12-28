@@ -1376,15 +1376,15 @@ debounce@^1.0.0:
   dependencies:
     date-now "1.0.1"
 
-debug@*, debug@^2.1.1, debug@^2.2.0:
+debug@*, debug@~0.8.0:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-0.8.1.tgz#20ff4d26f5e422cb68a1bacbbb61039ad8c1c130"
+
+debug@^2.1.1, debug@^2.2.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.5.1.tgz#9107bb4a506052ec2a02314bc606313ed2b921c1"
   dependencies:
     ms "0.7.2"
-
-debug@~0.8.0:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-0.8.1.tgz#20ff4d26f5e422cb68a1bacbbb61039ad8c1c130"
 
 debug@~2.2.0:
   version "2.2.0"
@@ -3169,10 +3169,6 @@ outpipe@^1.1.0:
   resolved "https://registry.yarnpkg.com/outpipe/-/outpipe-1.1.1.tgz#50cf8616365e87e031e29a5ec9339a3da4725fa2"
   dependencies:
     shell-quote "^1.4.2"
-
-p-throttle@mvila/p-throttle:
-  version "1.0.0"
-  resolved "https://codeload.github.com/mvila/p-throttle/tar.gz/9214e6f4b300e222fdae8043429684ac5407964c"
 
 package-json@^1.0.0:
   version "1.2.0"

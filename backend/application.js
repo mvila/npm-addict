@@ -52,6 +52,12 @@ class Application extends BackendApplication {
         if (fetch == null) fetch = this.environment === 'production';
         result = await this.start({ fetch });
         break;
+      case 'refetch':
+        // node backend refetch --start=0 --no-aws-cloud-watch-logs --no-slack-notifications &> refetch.log &
+        let start = 0;
+        if (this.argv.start) start = Number(this.argv.start);
+        result = await this.refetch(start);
+        break;
       case 'stats':
         result = await this.stats();
         break;
@@ -180,6 +186,11 @@ class Application extends BackendApplication {
     this.notifier.notify(`${this.displayName} backend started (v${this.version})`);
 
     return 'KEEP_ALIVE';
+  }
+
+  async refetch(start) {
+    let refetcher = new Fetcher(this, true);
+    await refetcher.refetch(start);
   }
 
   async stats() {
