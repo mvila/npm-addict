@@ -201,6 +201,9 @@ class Application extends BackendApplication {
     console.log(`Ignored packages: ${count}`);
     count = await this.store.Post.count();
     console.log(`Posts: ${count}`);
+    let result = await this.fetcher.getGitHubAPIRateLimit();
+    result = result.resources.core;
+    console.log(`GitHub API rate limit: ${result.limit} requests (${result.remaining} remaining)`);
   }
 
   async show(name) {

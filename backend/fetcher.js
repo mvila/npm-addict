@@ -281,6 +281,11 @@ export class Fetcher {
     }
   }
 
+  async getGitHubAPIRateLimit() {
+    let url = `${this.gitHubAPIURL}rate_limit`;
+    return await this.requestGitHubAPI(url);
+  }
+
   async requestGitHubAPI(url) {
     let auth = this.gitHubUsername + ':' + this.gitHubPersonalAccessToken;
     auth = new Buffer(auth).toString('base64');
