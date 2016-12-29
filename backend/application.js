@@ -203,7 +203,7 @@ class Application extends BackendApplication {
     console.log(`Posts: ${count}`);
     let result = await this.fetcher.getGitHubAPIRateLimit();
     result = result.resources.core;
-    console.log(`GitHub API rate limit: ${result.limit} requests (${result.remaining} remaining)`);
+    console.log(`GitHub API rate limit: ${result.limit} requests (${result.remaining} remaining, reset in ${Math.round(result.reset - Date.now() / 1000)} seconds)`);
   }
 
   async show(name) {
