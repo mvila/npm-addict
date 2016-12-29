@@ -84,6 +84,11 @@ class Application extends BackendApplication {
         if (!name) throw new Error('Package name is missing');
         result = await this.ignore(name);
         break;
+      case 'unreveal':
+        name = this.argv._[1];
+        if (!name) throw new Error('Package name is missing');
+        result = await this.unreveal(name);
+        break;
       case 'update':
         name = this.argv._[1];
         if (name) {
@@ -210,6 +215,7 @@ class Application extends BackendApplication {
     let pkg = await this.store.Package.getByName(name);
     if (!pkg) {
       console.error(`'${name}' package not found in the database`);
+      return;
     }
     pkg = pkg.toJSON();
     console.log(util.inspect(pkg, { depth: null, colors: true }));
@@ -250,6 +256,18 @@ class Application extends BackendApplication {
       reason: 'MANUALLY_IGNORED'
     });
     console.log(`'${name}' package has been manually marked as ignored`);
+  }
+
+  async unreveal(name) {
+    let pkg = await this.store.Package.getByName(name);
+    if (!pkg) {
+      console.error(`'${name}' package not found in the database`);
+      return;
+    }
+    pkg.revealed = undefined;
+    pkg.revealedOn = undefined;
+    await pkg.save();
+    console.log(`'${name}' package has been unrevealed`);
   }
 
   async update(name) {
