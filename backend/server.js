@@ -66,10 +66,12 @@ export class Server {
 
     // curl -v http://api.dev.npmaddict.com:20576/v1/health-check
     router.get('/health-check', async function(ctx) {
+      let time = Date.now();
       let count = await app.store.Package.count();
+      time = Date.now() - time;
       assert.ok(count > 0, 'There should be at least one package.');
       ctx.logLevel = 'silence';
-      ctx.body = 'OK';
+      ctx.body = `OK (${time} ms)`;
     });
 
     router.get('/packages', async function(ctx) {
