@@ -260,33 +260,53 @@ export class Fetcher {
   }
 
   async getGitHubPackageJSON(packageName, gitHubUser, gitHubRepo) {
-    let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/package.json`;
-    let pkg = await this.getGitHubJSONFile(url);
-    if (pkg && pkg.name === packageName) return pkg;
+    try {
+      let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/package.json`;
+      let pkg = await this.getGitHubJSONFile(url);
+      if (pkg && pkg.name === packageName) return pkg;
 
-    // There is no correct package.json at the root of the repository,
-    // let's try to find one in the rest of the repository
-    return undefined;
+      // There is no correct package.json at the root of the repository,
+      // let's try to find one in the rest of the repository
+      url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/git/trees/master?recursive=1`;
+      let result = await this.requestGitHubAPI(url);
+      if (!result) return undefined;
+      if (result.truncated) {
+        const message = `Result truncated while fetching GitHub tree for package '${packageName}'`;
+        this.app.log.warning(message);
+        this.app.notifier.notify(message);
+      }
+      for (const entry of result.tree) {
+        if (entry.type !== 'blob') continue;
+        const path = entry.path;
+        if (path === 'package.json') continue; // package.json file at root has already been fetched
+        if (!path.endsWith('/package.json')) continue;
+        let pkg = await this.getGitHubJSONFile(entry.url);
+        if (pkg && pkg.name === packageName) {
+          this.app.log.debug(`Correct package.json file found for package '${packageName}' at ${path}`);
+          return pkg;
+        }
+      }
+      return undefined;
+    } catch (err) {
+      this.app.log.warning(`An error occured while fetching GitHub package.json file for package '${packageName}' (${err.message})`);
+      return undefined;
+    }
   }
 
   async getGitHubJSONFile(url) {
+    let file = await this.requestGitHubAPI(url);
+    if (!file) return false;
+    if (file.encoding !== 'base64') {
+      this.app.log.warning(`Unsupported GitHub file encoding found while fetching a file (${url}) from GitHub`);
+      return undefined;
+    }
+    let json = file.content;
+    json = new Buffer(json, 'base64').toString();
     try {
-      let file = await this.requestGitHubAPI(url);
-      if (!file) return false;
-      if (file.encoding !== 'base64') {
-        throw new Error('Unsupported GitHub file encoding');
-      }
-      let json = file.content;
-      json = new Buffer(json, 'base64').toString();
-      try {
-        let result = JSON.parse(json);
-        return result;
-      } catch (err) {
-        this.app.log.debug(`An error occured while parsing JSON of a file (${url}) from GitHub (${err.message})`);
-        return undefined;
-      }
+      let result = JSON.parse(json);
+      return result;
     } catch (err) {
-      this.app.log.warning(`An error occured while fetching a file from GitHub (${err.message})`);
+      this.app.log.debug(`An error occured while parsing JSON of a file (${url}) from GitHub (${err.message})`);
       return undefined;
     }
   }
@@ -297,6 +317,7 @@ export class Fetcher {
   }
 
   async requestGitHubAPI(url) {
+    this.app.log.debug(`Fetching GitHub API: ${url}`);
     let auth = this.gitHubUsername + ':' + this.gitHubPersonalAccessToken;
     auth = new Buffer(auth).toString('base64');
     while (true) {
