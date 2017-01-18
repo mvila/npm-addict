@@ -206,8 +206,10 @@ export class Fetcher {
 
       let gitHubStars, gitHubPackageJSON;
       if (gitHubResult) {
-        gitHubStars = gitHubResult.stargazers_count;
-        gitHubPackageJSON = await this.getGitHubPackageJSON(parsedGitHubURL);
+        gitHubPackageJSON = await this.getGitHubPackageJSON(name, parsedGitHubURL.user, parsedGitHubURL.repo);
+        if (gitHubPackageJSON) {
+          gitHubStars = gitHubResult.stargazers_count;
+        }
       }
 
       let description = npmResult.description;
@@ -257,9 +259,18 @@ export class Fetcher {
     }
   }
 
-  async getGitHubPackageJSON({ user, repo }) {
+  async getGitHubPackageJSON(packageName, gitHubUser, gitHubRepo) {
+    let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/package.json`;
+    let pkg = await this.getGitHubJSONFile(url);
+    if (pkg && pkg.name === packageName) return pkg;
+
+    // There is no correct package.json at the root of the repository,
+    // let's try to find one in the rest of the repository
+    return undefined;
+  }
+
+  async getGitHubJSONFile(url) {
     try {
-      let url = `${this.gitHubAPIURL}repos/${user}/${repo}/contents/package.json`;
       let file = await this.requestGitHubAPI(url);
       if (!file) return false;
       if (file.encoding !== 'base64') {
@@ -268,14 +279,14 @@ export class Fetcher {
       let json = file.content;
       json = new Buffer(json, 'base64').toString();
       try {
-        let pkg = JSON.parse(json);
-        return pkg;
+        let result = JSON.parse(json);
+        return result;
       } catch (err) {
-        this.app.log.debug(`An error occured while parsing JSON of package.json file from '${user}/${repo}' GitHub repository (${err.message})`);
+        this.app.log.debug(`An error occured while parsing JSON of a file (${url}) from GitHub (${err.message})`);
         return undefined;
       }
     } catch (err) {
-      this.app.log.warning(`An error occured while fetching package.json file from '${user}/${repo}' GitHub repository (${err.message})`);
+      this.app.log.warning(`An error occured while fetching a file from GitHub (${err.message})`);
       return undefined;
     }
   }

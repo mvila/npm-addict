@@ -103,6 +103,9 @@ class Application extends BackendApplication {
         if (!name) throw new Error('Package name is missing');
         result = await this.tweet(name);
         break;
+      case 'fix':
+        result = await this.fix();
+        break;
       default:
         throw new Error(`Unknown command '${command}'`);
     }
@@ -295,6 +298,27 @@ class Application extends BackendApplication {
     } catch (err) {
       this.app.log.warning(`An error occured while tweeting '${pkg.name}' package`);
     }
+  }
+
+  async fix() {
+    await this.store.Package.forEach({}, async (pkg) => {
+      console.log('***');
+      let fixed;
+      if (pkg.gitHubResult) {
+        if (pkg.gitHubPackageJSON && pkg.gitHubPackageJSON.name !== pkg.name) {
+          pkg.gitHubPackageJSON = undefined;
+          fixed = true;
+        }
+        if (!pkg.gitHubPackageJSON && pkg.gitHubStars != null) {
+          pkg.gitHubStars = undefined;
+          fixed = true;
+        }
+      }
+      if (fixed) {
+        await pkg.save();
+        console.log(`'${pkg.name}' package has been fixed`);
+      }
+    });
   }
 }
 

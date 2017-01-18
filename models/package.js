@@ -69,12 +69,6 @@ export class Package extends Model {
       return false;
     }
 
-    let verification = this.verifyGitHubRepositoryOwnership();
-    if (verification === false) {
-      log.info(`'${this.name}' package has a GitHub repository but the ownership verification failed`);
-      return false;
-    }
-
     if (this.reveal != null) {
       let message = `'${this.name}' package has a reveal property set to ${this.reveal ? 'true' : 'false'}`;
       log.notice(message);
@@ -103,12 +97,6 @@ export class Package extends Model {
     }
 
     return true;
-  }
-
-  verifyGitHubRepositoryOwnership() {
-    if (!this.gitHubResult) return undefined;
-    if (!this.gitHubPackageJSON) return false;
-    return this.gitHubPackageJSON.name === this.name;
   }
 }
 
