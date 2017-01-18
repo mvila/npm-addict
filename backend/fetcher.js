@@ -182,7 +182,17 @@ export class Fetcher {
       let lastPublisher = npmResult.lastPublisher;
       let license = npmResult.license;
       let reveal = npmResult.reveal;
+
+      if (!npmResult.created) {
+        this.app.log.warning(`Package '${name}' doesn't have a created date`);
+        return undefined;
+      }
       let createdOn = new Date(npmResult.created);
+
+      if (!npmResult.modified) {
+        this.app.log.warning(`Package '${name}' doesn't have an updated date`);
+        return undefined;
+      }
       let updatedOn = new Date(npmResult.modified);
 
       let npmURL = this.npmWebsitePackageURL + name;

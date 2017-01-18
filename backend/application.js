@@ -302,7 +302,6 @@ class Application extends BackendApplication {
 
   async fix() {
     await this.store.Package.forEach({}, async (pkg) => {
-      console.log('***');
       let fixed;
       if (pkg.gitHubResult) {
         if (pkg.gitHubPackageJSON && pkg.gitHubPackageJSON.name !== pkg.name) {
