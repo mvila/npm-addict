@@ -303,6 +303,13 @@ class Application extends BackendApplication {
     }
   }
 
+  async notifyOnce(name, message) {
+    if (await this.store.Notification.hasName(name)) return;
+    this.notifier.notify(message);
+    let notification = new this.store.Notification({ name, message });
+    await notification.save();
+  }
+
   async fix1() {
     await this.store.Package.forEach({}, async (pkg) => {
       let fixed;
