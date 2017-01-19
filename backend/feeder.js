@@ -15,14 +15,14 @@ export class Feeder {
     while (true) {
       await sleep(SLEEP_TIME);
       if (!this.app.state.lastUpdateDate) continue;
-      let todayDate = moment.utc().startOf('day').toDate();
+      const todayDate = moment.utc().startOf('day').toDate();
       if (this.app.state.lastUpdateDate < todayDate) continue;
-      let yesterdayDate = moment(todayDate).subtract(1, 'days').toDate();
+      const yesterdayDate = moment(todayDate).subtract(1, 'days').toDate();
       let lastDate = this.app.state.lastDailyFeedPostDate;
       if (!lastDate) lastDate = moment(yesterdayDate).subtract(3, 'days').toDate();
-      let days = moment(yesterdayDate).diff(moment(lastDate), 'days');
+      const days = moment(yesterdayDate).diff(moment(lastDate), 'days');
       for (let day = 0; day < days; day++) {
-        let date = moment(lastDate).add(1, 'days').toDate();
+        const date = moment(lastDate).add(1, 'days').toDate();
         await this.post(date);
         lastDate = date;
         this.app.state.lastDailyFeedPostDate = lastDate;
@@ -32,9 +32,9 @@ export class Feeder {
   }
 
   async post(date) {
-    let start = date;
-    let endBefore = moment(date).add(1, 'days').toDate();
-    let packages = await this.app.store.Package.find({
+    const start = date;
+    const endBefore = moment(date).add(1, 'days').toDate();
+    const packages = await this.app.store.Package.find({
       query: { revealed: true },
       order: 'revealedOn',
       start: start.toJSON(),
@@ -46,10 +46,10 @@ export class Feeder {
       return;
     }
 
-    let title = `New npm Packages on ${moment.utc(start).format('LL')}`;
+    const title = `New npm Packages on ${moment.utc(start).format('LL')}`;
 
     let content = '';
-    for (let pkg of packages) {
+    for (const pkg of packages) {
       content += '<p>\n';
       content += `<a href="${pkg.bestURL}">`;
       content += `${escape(pkg.name)}`;
@@ -59,7 +59,7 @@ export class Feeder {
       content += '</p>\n';
     }
 
-    let url = this.app.frontendURL + '#/days/' + moment.utc(start).format('YYYY-MM-DD');
+    const url = this.app.frontendURL + '#/days/' + moment.utc(start).format('YYYY-MM-DD');
 
     await this.app.store.Post.put({ title, content, url });
 

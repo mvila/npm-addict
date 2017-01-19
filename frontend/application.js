@@ -1,6 +1,6 @@
 'use strict';
 
-let pathModule = require('path');
+const pathModule = require('path');
 import BackendApplication from '../backend-application';
 import Builder from './builder';
 import Server from './server';
@@ -27,11 +27,11 @@ class Application extends BackendApplication {
   }
 
   async run() {
-    let command = this.argv._[0];
+    const command = this.argv._[0];
     if (!command) throw new Error('Command is missing');
     switch (command) {
       case 'build':
-        let watch = this.argv.watch === true;
+        const watch = this.argv.watch === true;
         await this.build({ watch });
         break;
       case 'start':
@@ -43,7 +43,7 @@ class Application extends BackendApplication {
   }
 
   async build(options = {}) {
-    let builder = new Builder(this, {
+    const builder = new Builder(this, {
       sourceDir: pathModule.join(__dirname, 'src'),
       targetDir: pathModule.join(__dirname, 'dist'),
 
@@ -82,7 +82,7 @@ class Application extends BackendApplication {
   }
 
   async start() {
-    let server = new Server(this, {
+    const server = new Server(this, {
       port: this.port,
       path: pathModule.join(__dirname, 'dist')
     });
@@ -91,7 +91,7 @@ class Application extends BackendApplication {
   }
 }
 
-let app = new Application({ name: 'npm-addict-frontend' });
+const app = new Application({ name: 'npm-addict-frontend' });
 
 app.run().catch(function(err) {
   app.handleUncaughtException(err);

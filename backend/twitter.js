@@ -42,7 +42,7 @@ export class Twitter {
   async loadConfiguration() {
     if (this.disabled) return;
     try {
-      let data = (await this.twit.get('help/configuration')).data;
+      const data = (await this.twit.get('help/configuration')).data;
       if (data.errors) throw new Error(data.errors[0].message);
       this.configuration = data;
       this.app.log.info('Twitter configuration loaded');
@@ -53,9 +53,9 @@ export class Twitter {
 
   async post(text, url) {
     if (!(await this.initialize())) return;
-    let status = this.format(text, url);
+    const status = this.format(text, url);
     try {
-      let data = (await this.twit.post('statuses/update', { status })).data;
+      const data = (await this.twit.post('statuses/update', { status })).data;
       if (data.errors) throw new Error(data.errors[0].message);
       this.app.log.info(`"${status}" status tweeted`);
     } catch (err) {

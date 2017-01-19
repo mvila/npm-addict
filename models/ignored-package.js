@@ -10,7 +10,7 @@ export class IgnoredPackage extends Model {
   @updatedOn() updatedOn;
 
   static async getByName(name) {
-    let ignoredPackages = await this.find({ query: { name }, limit: 1 });
+    const ignoredPackages = await this.find({ query: { name }, limit: 1 });
     return ignoredPackages[0];
   }
 }

@@ -42,15 +42,15 @@ export class Packages extends React.Component {
   }
 
   render() {
-    let packages = this.app.packages || [];
-    let currentDate = this.app.currentDate;
+    const packages = this.app.packages || [];
+    const currentDate = this.app.currentDate;
 
-    let lists = [];
+    const lists = [];
     let list;
-    for (let pkg of packages) {
+    for (const pkg of packages) {
       let date = moment(pkg.revealedOn);
       if (currentDate) date = date.utc();
-      let listId = date.format('YYYYMMDD');
+      const listId = date.format('YYYYMMDD');
       if (!list || list.id !== listId) {
         list = {
           id: listId,

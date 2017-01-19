@@ -3,7 +3,7 @@
 import EventEmitterMixin from 'event-emitter-mixin';
 import { jsonLocalStorage } from 'json-web-storage';
 
-let VERSION = 1;
+const VERSION = 1;
 
 export class LocalData extends EventEmitterMixin() {
   constructor() {

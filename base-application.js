@@ -1,10 +1,10 @@
 'use strict';
 
 import EventEmitterMixin from 'event-emitter-mixin';
-let environment = require('better-node-env');
+const environment = require('better-node-env');
 import UniversalLog from 'universal-log';
 import EasyNotifier from 'easy-notifier';
-let pkg = require('./package.json');
+const pkg = require('./package.json');
 
 export class BaseApplication extends EventEmitterMixin() {
   constructor({ name, displayName, description, version } = {}) {
@@ -20,7 +20,7 @@ export class BaseApplication extends EventEmitterMixin() {
 
     this.environment = environment;
 
-    let options = { appName: this.name, muteLevels: ['silence'] };
+    const options = { appName: this.name, muteLevels: ['silence'] };
     if (this.environment !== 'development') options.muteLevels.push('trace');
     this.log = new UniversalLog(options);
 

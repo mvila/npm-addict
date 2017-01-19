@@ -7,7 +7,7 @@ import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 import denodeify from 'denodeify';
 import ncpModule from 'ncp';
-let ncp = denodeify(ncpModule.ncp);
+const ncp = denodeify(ncpModule.ncp);
 import UglifyJS from 'uglify-js';
 import browserify from 'browserify';
 import babelify from 'babelify';
@@ -83,7 +83,7 @@ export class Builder {
   async buildCSS() {
     let output = '';
 
-    let cssPaths = this.vendorCSSPaths.map(path => {
+    const cssPaths = this.vendorCSSPaths.map(path => {
       return pathModule.join(this.sourceDir, this.vendorDirname, path);
     });
     cssPaths.forEach(function(path) {
@@ -91,9 +91,9 @@ export class Builder {
     });
 
     if (this.sassFilename) {
-      let sass = require('node-sass');
-      let inputDir = pathModule.join(this.sourceDir, this.inputStylesDirname || '');
-      let inputPath = pathModule.join(inputDir, this.sassFilename);
+      const sass = require('node-sass');
+      const inputDir = pathModule.join(this.sourceDir, this.inputStylesDirname || '');
+      const inputPath = pathModule.join(inputDir, this.sassFilename);
       output += sass.renderSync({
         file: inputPath,
         includePaths: [inputDir]
@@ -101,9 +101,9 @@ export class Builder {
     }
 
     if (output) {
-      let outputDir = pathModule.join(this.targetDir, this.outputStylesDirname || '');
+      const outputDir = pathModule.join(this.targetDir, this.outputStylesDirname || '');
       mkdirp.sync(outputDir);
-      let outputPath = pathModule.join(outputDir, this.cssFilename);
+      const outputPath = pathModule.join(outputDir, this.cssFilename);
       fs.writeFileSync(outputPath, output);
       this.addAppCachePath(pathModule.join(this.outputStylesDirname || '', this.cssFilename));
     }
@@ -112,13 +112,13 @@ export class Builder {
   }
 
   async watchCSS() {
-    let watch = require('node-watch');
-    let cssDir = pathModule.join(this.sourceDir, this.inputStylesDirname || '');
+    const watch = require('node-watch');
+    const cssDir = pathModule.join(this.sourceDir, this.inputStylesDirname || '');
     let filenames = [];
     if (this.sassFilename) filenames.push(this.sassFilename);
     filenames = filenames.concat(this.sassDependencyFilenames);
     if (!filenames.length) return;
-    let paths = filenames.map(filename => {
+    const paths = filenames.map(filename => {
       return pathModule.join(cssDir, filename);
     });
     watch(paths, async function() {
@@ -134,9 +134,9 @@ export class Builder {
   }
 
   async copyStaticFiles() {
-    let outputDir = this.targetDir;
+    const outputDir = this.targetDir;
     for (let i = 0; i < this.staticFilePaths.length; i++) {
-      let path = this.staticFilePaths[i];
+      const path = this.staticFilePaths[i];
       let srcPth, dstPth;
       if (typeof path === 'object') {
         srcPth = path.src;
@@ -144,8 +144,8 @@ export class Builder {
       } else {
         srcPth = dstPth = path;
       }
-      let inputPath = pathModule.join(this.sourceDir, srcPth);
-      let outputPath = pathModule.join(outputDir, dstPth);
+      const inputPath = pathModule.join(this.sourceDir, srcPth);
+      const outputPath = pathModule.join(outputDir, dstPth);
       await ncp(inputPath, outputPath, {
         stopOnErr: true,
         filter(pth) {
@@ -161,8 +161,8 @@ export class Builder {
   }
 
   async watchStaticFiles() {
-    let watch = require('node-watch');
-    let filePaths = this.staticFilePaths.map(path => {
+    const watch = require('node-watch');
+    const filePaths = this.staticFilePaths.map(path => {
       if (typeof path === 'object') path = path.src;
       return pathModule.join(this.sourceDir, path);
     });
@@ -176,7 +176,7 @@ export class Builder {
   }
 
   async concatVendorScript() {
-    let scriptPaths = this.vendorScriptPaths.map(path => {
+    const scriptPaths = this.vendorScriptPaths.map(path => {
       return pathModule.join(this.sourceDir, this.vendorDirname, path);
     });
     let output = '';
@@ -186,14 +186,14 @@ export class Builder {
           output += fs.readFileSync(path, 'utf8');
         });
       } else {
-        let result = UglifyJS.minify(scriptPaths);
+        const result = UglifyJS.minify(scriptPaths);
         output += result.code;
       }
     }
     if (output) {
-      let outputDir = pathModule.join(this.targetDir, this.scriptsDirname || '');
+      const outputDir = pathModule.join(this.targetDir, this.scriptsDirname || '');
       mkdirp.sync(outputDir);
-      let outputPath = pathModule.join(outputDir, this.vendorScriptFilename);
+      const outputPath = pathModule.join(outputDir, this.vendorScriptFilename);
       fs.writeFileSync(outputPath, output);
       this.addAppCachePath(pathModule.join(this.scriptsDirname || '', this.vendorScriptFilename));
     }
@@ -205,9 +205,9 @@ export class Builder {
     if (this.watchMode) {
       watchify = require('watchify');
     }
-    let inputDir = this.sourceDir;
-    let inputPath = pathModule.join(inputDir, this.appScriptFilename);
-    let opts = this.watchMode ? watchify.args : {};
+    const inputDir = this.sourceDir;
+    const inputPath = pathModule.join(inputDir, this.appScriptFilename);
+    const opts = this.watchMode ? watchify.args : {};
     // if (this.app.environment === 'development') opts.debug = true;
     if (this.app.environment === 'development') opts.fullPaths = true;
     let bro = browserify(opts);
@@ -217,7 +217,7 @@ export class Builder {
     });
     bro.require(inputPath, { entry: true });
     if (this.watchMode) bro = watchify(bro);
-    let originalBundle = bro.bundle;
+    const originalBundle = bro.bundle;
     function _bundle() {
       return new Promise(function(resolve, reject) {
         originalBundle.call(bro, function(err, res) {
@@ -225,13 +225,13 @@ export class Builder {
         });
       });
     }
-    let bundle = async function() {
+    const bundle = async function() {
       let output = await _bundle();
       if (this.app.environment !== 'development') {
         output = (UglifyJS.minify(output.toString(), { fromString: true })).code;
       }
-      let outputDir = pathModule.join(this.targetDir, this.scriptsDirname || '');
-      let outputPath = pathModule.join(outputDir, this.browserifiedAppScriptFilename);
+      const outputDir = pathModule.join(this.targetDir, this.scriptsDirname || '');
+      const outputPath = pathModule.join(outputDir, this.browserifiedAppScriptFilename);
       fs.writeFileSync(outputPath, output);
       this.app.log.info('browserifyAppScript: done');
     }.bind(this);
@@ -253,13 +253,13 @@ export class Builder {
   }
 
   async copyHTMLIndexFiles() {
-    for (let filename of this.htmlIndexFilenames) {
-      let inputDir = this.sourceDir;
-      let inputPath = pathModule.join(inputDir, filename);
+    for (const filename of this.htmlIndexFilenames) {
+      const inputDir = this.sourceDir;
+      const inputPath = pathModule.join(inputDir, filename);
       let html = fs.readFileSync(inputPath, 'utf8');
       html = this.resolveVariables(html);
       let outputDir = this.targetDir;
-      let outputPath = pathModule.join(outputDir, filename);
+      const outputPath = pathModule.join(outputDir, filename);
       outputDir = pathModule.dirname(outputPath);
       mkdirp.sync(outputDir);
       fs.writeFileSync(outputPath, html);
@@ -279,7 +279,7 @@ export class Builder {
     output += '\n';
     output += 'NETWORK:\n';
     output += this.appCacheNetworkPaths.join('\n') + '\n';
-    let outputPath = pathModule.join(this.targetDir, this.appCacheManifestFilename);
+    const outputPath = pathModule.join(this.targetDir, this.appCacheManifestFilename);
     fs.writeFileSync(outputPath, output);
     this.app.log.info('buildAppCacheManifestFile: done');
   }

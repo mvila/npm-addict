@@ -6,7 +6,7 @@ import Common from './common';
 @Common
 export class Footer extends React.Component {
   render() {
-    let separator = <span style={{ marginLeft: '0.5rem', marginRight: '0.5rem', color: this.theme.borderColor }}>|</span>;
+    const separator = <span style={{ marginLeft: '0.5rem', marginRight: '0.5rem', color: this.theme.borderColor }}>|</span>;
     return (
       <footer style={{ flexShrink: 0, textAlign: 'center', fontSize: this.theme.smallFontSize }}>
         <div>

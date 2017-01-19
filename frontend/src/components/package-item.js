@@ -18,7 +18,7 @@ export class PackageItem extends React.Component {
   };
 
   render() {
-    let { item } = this.props;
+    const { item } = this.props;
 
     return (
       <li key='line' style={[{ marginBottom: '.5rem', wordWrap: 'break-word', ':hover': {} }]}>

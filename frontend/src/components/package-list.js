@@ -13,12 +13,12 @@ export class PackageList extends React.Component {
   };
 
   render() {
-    let t = this.theme;
-    let s = this.styles;
+    const t = this.theme;
+    const s = this.styles;
 
-    let currentDate = this.app.currentDate;
+    const currentDate = this.app.currentDate;
 
-    let { date, items } = this.props;
+    const { date, items } = this.props;
 
     let displayDate;
     if (!currentDate) {

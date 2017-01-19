@@ -10,7 +10,7 @@ export class Notification extends Model {
   @updatedOn() updatedOn;
 
   static async hasName(name) {
-    let count = await this.count({ query: { name } });
+    const count = await this.count({ query: { name } });
     return count > 0;
   }
 }

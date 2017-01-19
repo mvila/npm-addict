@@ -49,13 +49,13 @@ class Application extends FrontendApplication {
   }
 
   handleHashChange() {
-    let page = this.getCurrentPageFromHash();
+    const page = this.getCurrentPageFromHash();
     if (page !== this.currentPage) {
       this.currentPage = page;
       this.emit('currentPage.didChange');
     }
     if (page === 'packages') {
-      let date = this.getCurrentDateFromHash();
+      const date = this.getCurrentDateFromHash();
       if (date !== this.currentDate) {
         this.currentDate = date;
         this.emit('currentDate.didChange');
@@ -91,7 +91,7 @@ class Application extends FrontendApplication {
 
     let query = { limit: PACKAGES_PER_PAGE + 1 };
     if (this.packages.length) {
-      let lastPackage = this.packages[this.packages.length - 1];
+      const lastPackage = this.packages[this.packages.length - 1];
       query.startAfter = lastPackage.revealedOn.toJSON();
     } else if (this.currentDate) {
       query.start = this.currentDate.toJSON();
@@ -100,17 +100,17 @@ class Application extends FrontendApplication {
       query.endBefore = moment(this.currentDate).add(1, 'days').toDate().toJSON();
     }
     query.reverse = this.currentDate ? '0' : '1';
-    let clientId = this.localData.clientId;
+    const clientId = this.localData.clientId;
     if (clientId) query.clientId = clientId;
     query = querystring.stringify(query);
     if (query) url += '?' + query;
 
-    let response = await fetch(url);
+    const response = await fetch(url);
     if (response.status !== 200) {
       throw new Error(`Bad response from the API while fetching new packages (HTTP status: ${response.status})`);
     }
 
-    let fetchedPackages = await response.json();
+    const fetchedPackages = await response.json();
     if (fetchedPackages.length > PACKAGES_PER_PAGE) {
       fetchedPackages.pop();
       this.noMorePackageToLoad = false;
@@ -118,7 +118,7 @@ class Application extends FrontendApplication {
       this.noMorePackageToLoad = true;
     }
 
-    for (let pkg of fetchedPackages) {
+    for (const pkg of fetchedPackages) {
       this.packages.push(new Package(pkg));
     }
 
@@ -128,6 +128,6 @@ class Application extends FrontendApplication {
   }
 }
 
-let app = new Application({ name: 'npm-addict-frontend' });
+const app = new Application({ name: 'npm-addict-frontend' });
 
 app.run().catch(app.log.error);

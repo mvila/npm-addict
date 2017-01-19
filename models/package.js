@@ -30,7 +30,7 @@ export class Package extends Model {
   @updatedOn() itemUpdatedOn;
 
   static async getByName(name) {
-    let packages = await this.find({ query: { name }, limit: 1 });
+    const packages = await this.find({ query: { name }, limit: 1 });
     return packages[0];
   }
 
@@ -39,7 +39,7 @@ export class Package extends Model {
     if (!description) return '';
     description = description.trim();
     description = description.charAt(0).toUpperCase() + description.substr(1);
-    let lastChar = description.substr(-1);
+    const lastChar = description.substr(-1);
     if (lastChar !== '.' && lastChar !== '!' && lastChar !== '?') {
       description += '.';
     }
@@ -51,15 +51,15 @@ export class Package extends Model {
   }
 
   determineRevealed() {
-    let log = this.context.log;
-    let notifier = this.context.notifier;
+    const log = this.context.log;
+    const notifier = this.context.notifier;
 
     if (!this.createdOn) {
       log.info(`'${this.name}' package doesn't have a creation date`);
       return false;
     }
 
-    let minimumDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000); // 6 months
+    const minimumDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000); // 6 months
     if (this.createdOn < minimumDate) {
       log.info(`'${this.name}' package was created too long ago (creation date: ${this.createdOn.toISOString()})`);
       return false;
@@ -71,7 +71,7 @@ export class Package extends Model {
     }
 
     if (this.reveal != null) {
-      let message = `'${this.name}' package has a reveal property set to ${this.reveal ? 'true' : 'false'}`;
+      const message = `'${this.name}' package has a reveal property set to ${this.reveal ? 'true' : 'false'}`;
       log.notice(message);
       notifier.notify(message);
       return this.reveal;
@@ -83,7 +83,7 @@ export class Package extends Model {
       return false;
     }
 
-    let readme = this.npmResult.readme;
+    const readme = this.npmResult.readme;
     if (!readme) {
       log.info(`'${this.name}' package doesn't have a README`);
       return false;

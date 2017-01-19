@@ -29,12 +29,12 @@ export class Fetcher {
   async run() {
     if (this.app.state.lastRegistryUpdateSeq == null) {
       this.app.log.info('Fetching \'lastRegistryUpdateSeq\' from npm registry');
-      let url = this.npmRegistryURL;
-      let response = await fetch(url, { timeout: FETCH_TIMEOUT });
+      const url = this.npmRegistryURL;
+      const response = await fetch(url, { timeout: FETCH_TIMEOUT });
       if (response.status !== 200) {
         throw new Error(`Bad response from npm registry while getting the last 'update_seq' (HTTP status: ${response.status})`);
       }
-      let result = await response.json();
+      const result = await response.json();
       this.app.state.lastRegistryUpdateSeq = result.update_seq;
       await this.app.state.save();
       this.app.log.info(`'lastRegistryUpdateSeq' setted to ${this.app.state.lastRegistryUpdateSeq}`);
@@ -42,21 +42,21 @@ export class Fetcher {
 
     this.app.log.info(`Listening registry changes (lastRegistryUpdateSeq: ${this.app.state.lastRegistryUpdateSeq})`);
 
-    let changes = new ChangesStream({
+    const changes = new ChangesStream({
       db: this.npmRegistryURL,
       since: this.app.state.lastRegistryUpdateSeq,
       'include_docs': true
     });
 
     changes.on('readable', async () => {
-      let change = changes.read();
+      const change = changes.read();
       changes.pause();
       try {
         this.app.log.trace(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
         if (change.deleted) {
           await this.deletePackage(change.id);
         } else {
-          let pkg = await this.createOrUpdatePackage(change.id, change.doc);
+          const pkg = await this.createOrUpdatePackage(change.id, change.doc);
           if (pkg && (this.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
             this.app.state.lastUpdateDate = pkg.updatedOn;
           }
@@ -72,21 +72,21 @@ export class Fetcher {
   refetch(startSeq = 0) {
     return new Promise((resolve, reject) => {
       try {
-        let endSeq = this.app.state.lastRegistryUpdateSeq;
+        const endSeq = this.app.state.lastRegistryUpdateSeq;
         if (endSeq == null) {
           throw new Error('\'lastRegistryUpdateSeq\' is undefined');
         }
 
         this.app.log.info(`Refetching registry from ${startSeq} to ${endSeq}`);
 
-        let changes = new ChangesStream({
+        const changes = new ChangesStream({
           db: this.npmRegistryURL,
           since: startSeq,
           'include_docs': true
         });
 
         changes.on('readable', async () => {
-          let change = changes.read();
+          const change = changes.read();
           if (change.seq >= endSeq) {
             changes.destroy();
             resolve();
@@ -117,19 +117,19 @@ export class Fetcher {
   async createOrUpdatePackage(name, prefetchedNPMResult) {
     let item = await this.app.store.Package.getByName(name);
     if (!item) item = new this.app.store.Package();
-    let pkg = await this.fetchPackage(name, item, prefetchedNPMResult);
+    const pkg = await this.fetchPackage(name, item, prefetchedNPMResult);
     if (!pkg) return undefined;
     Object.assign(item, pkg);
     let hasBeenRevealed = false;
     if (!item.revealed && !this.refetchMode) {
-      let revealed = item.determineRevealed();
+      const revealed = item.determineRevealed();
       if (revealed) {
         item.revealed = true;
         item.revealedOn = new Date();
         hasBeenRevealed = true;
       }
     }
-    let wasNew = item.isNew;
+    const wasNew = item.isNew;
     await item.save();
     this.app.log.info(`'${name}' package ${wasNew ? 'added' : 'updated'}`);
     if (hasBeenRevealed) {
@@ -140,7 +140,7 @@ export class Fetcher {
   }
 
   async deletePackage(name) {
-    let item = await this.app.store.Package.getByName(name);
+    const item = await this.app.store.Package.getByName(name);
     if (!item) return;
     await item.delete();
     this.app.log.info(`'${name}' package deleted`);
@@ -148,7 +148,7 @@ export class Fetcher {
 
   async fetchPackage(name, currentPackage, prefetchedNPMResult) {
     try {
-      let ignoredPackage = await this.app.store.IgnoredPackage.getByName(name);
+      const ignoredPackage = await this.app.store.IgnoredPackage.getByName(name);
       if (ignoredPackage) {
         this.app.log.debug(`'${name}' package ignored`);
         return undefined;
@@ -156,8 +156,8 @@ export class Fetcher {
 
       let npmResult = prefetchedNPMResult;
       if (!npmResult) {
-        let url = this.npmAPIPackageURL + name.replace('/', '%2F');
-        let response = await fetch(url, { timeout: FETCH_TIMEOUT });
+        const url = this.npmAPIPackageURL + name.replace('/', '%2F');
+        const response = await fetch(url, { timeout: FETCH_TIMEOUT });
         if (response.status !== 200) {
           this.app.log.warning(`Bad response from npm registry while fetching '${name}' package (HTTP status: ${response.status})`);
           return undefined;
@@ -176,26 +176,26 @@ export class Fetcher {
         return undefined;
       }
 
-      let keywords = npmResult.keywords;
-      let readme = npmResult.readme;
-      let version = npmResult.version;
-      let lastPublisher = npmResult.lastPublisher;
-      let license = npmResult.license;
-      let reveal = npmResult.reveal;
+      const keywords = npmResult.keywords;
+      const readme = npmResult.readme;
+      const version = npmResult.version;
+      const lastPublisher = npmResult.lastPublisher;
+      const license = npmResult.license;
+      const reveal = npmResult.reveal;
 
       if (!npmResult.created) {
         this.app.log.warning(`Package '${name}' doesn't have a created date`);
         return undefined;
       }
-      let createdOn = new Date(npmResult.created);
+      const createdOn = new Date(npmResult.created);
 
       if (!npmResult.modified) {
         this.app.log.warning(`Package '${name}' doesn't have an updated date`);
         return undefined;
       }
-      let updatedOn = new Date(npmResult.modified);
+      const updatedOn = new Date(npmResult.modified);
 
-      let npmURL = this.npmWebsitePackageURL + name;
+      const npmURL = this.npmWebsitePackageURL + name;
 
       let gitHubResult, parsedGitHubURL, gitHubURL;
       if (npmResult.repository) {
@@ -261,7 +261,7 @@ export class Fetcher {
 
   async fetchGitHubRepository(gitHubUser, gitHubRepo) {
     try {
-      let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}`;
+      const url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}`;
       return await this.requestGitHubAPI(url);
     } catch (err) {
       this.app.log.warning(`An error occured while fetching '${gitHubUser}/${gitHubRepo}' repository from GitHub API (${err.message})`);
@@ -273,14 +273,14 @@ export class Fetcher {
     try {
       const defaultPath = previousPath || 'package.json';
       let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/${defaultPath}`;
-      let pkg = await this.getGitHubJSONFile(url);
+      const pkg = await this.getGitHubJSONFile(url);
       if (pkg && pkg.name === packageName) return { pkg, path: defaultPath };
 
       // There is no correct package.json at the root of the repository,
       // let's try to find one in the rest of the repository
       this.app.log.debug(`Searching a correct package.json file for '${packageName}' package...`);
       url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/git/trees/master?recursive=1`;
-      let result = await this.requestGitHubAPI(url);
+      const result = await this.requestGitHubAPI(url);
       if (!result) return undefined;
       if (result.truncated) {
         const message = `Result truncated while fetching GitHub tree for package '${packageName}'`;
@@ -294,7 +294,7 @@ export class Fetcher {
         if (path === defaultPath) continue; // Default path has already been fetched
         if (path.includes('node_modules/')) continue;
         if (!path.endsWith('/package.json')) continue;
-        let pkg = await this.getGitHubJSONFile(entry.url);
+        const pkg = await this.getGitHubJSONFile(entry.url);
         if (pkg && pkg.name === packageName) {
           this.app.log.debug(`Correct package.json file found for package '${packageName}' at ${path}`);
           return { pkg, path };
@@ -315,7 +315,7 @@ export class Fetcher {
   }
 
   async getGitHubJSONFile(url) {
-    let file = await this.requestGitHubAPI(url);
+    const file = await this.requestGitHubAPI(url);
     if (!file) return false;
     if (file.encoding !== 'base64') {
       this.app.log.warning(`Unsupported GitHub file encoding found while fetching a file (${url}) from GitHub`);
@@ -324,7 +324,7 @@ export class Fetcher {
     let json = file.content;
     json = new Buffer(json, 'base64').toString();
     try {
-      let result = JSON.parse(json);
+      const result = JSON.parse(json);
       return result;
     } catch (err) {
       this.app.log.debug(`An error occured while parsing JSON of a file (${url}) from GitHub (${err.message})`);
@@ -333,7 +333,7 @@ export class Fetcher {
   }
 
   async getGitHubAPIRateLimit() {
-    let url = `${this.gitHubAPIURL}rate_limit`;
+    const url = `${this.gitHubAPIURL}rate_limit`;
     return await this.requestGitHubAPI(url);
   }
 
@@ -342,7 +342,7 @@ export class Fetcher {
     let auth = this.gitHubUsername + ':' + this.gitHubPersonalAccessToken;
     auth = new Buffer(auth).toString('base64');
     while (true) {
-      let response = await fetch(url, {
+      const response = await fetch(url, {
         headers: {
           Authorization: 'Basic ' + auth
         },
@@ -362,7 +362,7 @@ export class Fetcher {
           this.app.log.warning(`Bad response from GitHub API while requesting '${url}' URL (HTTP status is 403 but 'X-RateLimit-Remaining' header is ${response.headers.get('X-RateLimit-Remaining')})`);
           return undefined;
         }
-        let resetTime = Number(response.headers.get('X-RateLimit-Reset')) * 1000;
+        const resetTime = Number(response.headers.get('X-RateLimit-Reset')) * 1000;
         let waitTime = resetTime - Date.now() + 1000;
         if (waitTime <= 0) {
           this.app.log.debug(`Bad response from GitHub API while requesting '${url}' URL (HTTP status is 403 but 'X-RateLimit-Reset' is before current time)`);

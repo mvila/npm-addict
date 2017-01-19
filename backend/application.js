@@ -43,7 +43,7 @@ class Application extends BackendApplication {
 
     let result;
 
-    let command = this.argv._[0];
+    const command = this.argv._[0];
     if (!command) throw new Error('Command is missing');
     let name;
     switch (command) {
@@ -204,7 +204,7 @@ class Application extends BackendApplication {
   }
 
   async refetch(start) {
-    let refetcher = new Fetcher(this, true);
+    const refetcher = new Fetcher(this, true);
     await refetcher.refetch(start);
   }
 
@@ -238,12 +238,12 @@ class Application extends BackendApplication {
   }
 
   async delete(name) {
-    let pkg = await this.store.Package.getByName(name);
+    const pkg = await this.store.Package.getByName(name);
     if (pkg) {
       await pkg.delete();
       console.log(`'${name}' Package item deleted`);
     }
-    let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
+    const ignoredPackage = await this.store.IgnoredPackage.getByName(name);
     if (ignoredPackage) {
       await ignoredPackage.delete();
       console.log(`'${name}' IgnoredPackage item deleted`);
@@ -251,12 +251,12 @@ class Application extends BackendApplication {
   }
 
   async ignore(name) {
-    let ignoredPackage = await this.store.IgnoredPackage.getByName(name);
+    const ignoredPackage = await this.store.IgnoredPackage.getByName(name);
     if (ignoredPackage) {
       console.error(`'${name}' package has already been ignored`);
       return;
     }
-    let pkg = await this.store.Package.getByName(name);
+    const pkg = await this.store.Package.getByName(name);
     if (pkg) {
       await pkg.delete();
       console.log(`'${name}' package deleted`);
@@ -269,7 +269,7 @@ class Application extends BackendApplication {
   }
 
   async unreveal(name) {
-    let pkg = await this.store.Package.getByName(name);
+    const pkg = await this.store.Package.getByName(name);
     if (!pkg) {
       console.error(`'${name}' package not found in the database`);
       return;
@@ -292,14 +292,14 @@ class Application extends BackendApplication {
 
   async tweet(pkg) {
     if (typeof pkg === 'string') {
-      let name = pkg;
+      const name = pkg;
       pkg = await this.store.Package.getByName(name);
       if (!pkg) {
         console.error(`'${name}' package not found`);
         return;
       }
     }
-    let text = pkg.name + ': ' + pkg.formattedDescription;
+    const text = pkg.name + ': ' + pkg.formattedDescription;
     try {
       await this.twitter.post(text, pkg.bestURL);
     } catch (err) {
@@ -310,7 +310,7 @@ class Application extends BackendApplication {
   async notifyOnce(name, message) {
     if (await this.store.Notification.hasName(name)) return;
     this.notifier.notify(message);
-    let notification = new this.store.Notification({ name, message });
+    const notification = new this.store.Notification({ name, message });
     await notification.save();
   }
 
@@ -346,14 +346,14 @@ class Application extends BackendApplication {
   }
 
   async fix3() {
-    let refetcher = new Fetcher(this, true);
+    const refetcher = new Fetcher(this, true);
     let count = 0;
     let unfixedCount = 0;
     let fixedCount = 0;
     await this.store.Package.forEach({ batchSize: 1000 }, async (pkg) => {
       count++;
       if (pkg.gitHubResult && !pkg.gitHubPackageJSON) {
-        let newPkg = await refetcher.createOrUpdatePackage(pkg.name);
+        const newPkg = await refetcher.createOrUpdatePackage(pkg.name);
         const fixed = newPkg && !!newPkg.gitHubPackageJSON;
         if (fixed) {
           fixedCount++;
@@ -367,7 +367,7 @@ class Application extends BackendApplication {
   }
 }
 
-let app = new Application({ name: 'npm-addict-backend' });
+const app = new Application({ name: 'npm-addict-backend' });
 
 app.run().catch(function(err) {
   app.handleUncaughtException(err);

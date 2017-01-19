@@ -13,8 +13,8 @@ export class Feeds extends React.Component {
   };
 
   render() {
-    let dailyFeedURL = this.app.apiURL + 'feeds/daily';
-    let realTimeFeedURL = this.app.apiURL + 'feeds/real-time';
+    const dailyFeedURL = this.app.apiURL + 'feeds/daily';
+    const realTimeFeedURL = this.app.apiURL + 'feeds/real-time';
 
     return (
       <div style={this.props.style}>

@@ -16,9 +16,9 @@ export class Server {
   }
 
   start() {
-    let app = this.app;
+    const app = this.app;
 
-    let router = new Router({ prefix: '/v1' });
+    const router = new Router({ prefix: '/v1' });
 
     async function createUAVisitor(ctx, next) {
       let visitor;
@@ -39,10 +39,10 @@ export class Server {
         if (ip.startsWith('::ffff:')) ip = ip.substr(7);
         let language = ctx.headers['accept-language'];
         if (language) {
-          let index = language.indexOf('-');
+          const index = language.indexOf('-');
           if (index > 0) language = language.substr(0, index);
         }
-        let options = {
+        const options = {
           eventCategory: category,
           eventAction: action,
           ipOverride: ip,
@@ -67,7 +67,7 @@ export class Server {
     // curl -v http://api.dev.npmaddict.com:20576/v1/health-check
     router.get('/health-check', async function(ctx) {
       let time = Date.now();
-      let count = await app.store.Package.count();
+      const count = await app.store.Package.count();
       time = Date.now() - time;
       assert.ok(count > 0, 'There should be at least one package.');
       ctx.logLevel = 'silence';
@@ -75,17 +75,17 @@ export class Server {
     });
 
     router.get('/packages', async function(ctx) {
-      let start = ctx.query.start;
-      let startAfter = ctx.query.startAfter;
-      let end = ctx.query.end;
-      let endBefore = ctx.query.endBefore;
-      let reverse = ctx.query.reverse === '1';
-      let limit = Number(ctx.query.limit) || 100;
+      const start = ctx.query.start;
+      const startAfter = ctx.query.startAfter;
+      const end = ctx.query.end;
+      const endBefore = ctx.query.endBefore;
+      const reverse = ctx.query.reverse === '1';
+      const limit = Number(ctx.query.limit) || 100;
       if (limit > 300) {
         throw new Error('\'limit\' parameter cannot be greater than 300');
       }
 
-      let options = {
+      const options = {
         query: { revealed: true },
         order: 'revealedOn',
         reverse,
@@ -96,9 +96,9 @@ export class Server {
       if (end) options.end = end;
       if (endBefore) options.endBefore = endBefore;
 
-      let packages = await app.store.Package.find(options);
+      const packages = await app.store.Package.find(options);
 
-      let results = packages.map(function(pkg) {
+      const results = packages.map(function(pkg) {
         return pick(pkg, [
           'id', 'name', 'description', 'npmURL', 'gitHubURL', 'revealedOn'
         ]);
@@ -110,20 +110,20 @@ export class Server {
     });
 
     router.get('/feeds/daily', async function(ctx) {
-      let posts = await app.store.Post.find({
+      const posts = await app.store.Post.find({
         order: 'createdOn',
         reverse: true,
         limit: 30
       });
 
-      let feed = new RSS({
+      const feed = new RSS({
         title: app.displayName + ' (daily feed)',
         description: app.description,
         feed_url: app.url + 'feeds/daily', // eslint-disable-line camelcase
         site_url: app.frontendURL // eslint-disable-line camelcase
       });
 
-      for (let post of posts) {
+      for (const post of posts) {
         feed.item({
           title: post.title,
           description: post.content,
@@ -133,7 +133,7 @@ export class Server {
         });
       }
 
-      let xml = feed.xml({ indent: true });
+      const xml = feed.xml({ indent: true });
 
       ctx.type = 'application/rss+xml; charset=utf-8';
       ctx.body = xml;
@@ -142,21 +142,21 @@ export class Server {
     });
 
     router.get('/feeds/real-time', async function(ctx) {
-      let packages = await app.store.Package.find({
+      const packages = await app.store.Package.find({
         query: { revealed: true },
         order: 'revealedOn',
         reverse: true,
         limit: 100
       });
 
-      let feed = new RSS({
+      const feed = new RSS({
         title: app.displayName + ' (real-time feed)',
         description: 'One post for every new npm package',
         feed_url: app.url + 'feeds/real-time', // eslint-disable-line camelcase
         site_url: app.frontendURL // eslint-disable-line camelcase
       });
 
-      for (let pkg of packages) {
+      for (const pkg of packages) {
         feed.item({
           title: pkg.name,
           description: pkg.formattedDescription,
@@ -166,7 +166,7 @@ export class Server {
         });
       }
 
-      let xml = feed.xml({ indent: true });
+      const xml = feed.xml({ indent: true });
 
       ctx.type = 'application/rss+xml; charset=utf-8';
       ctx.body = xml;
@@ -176,7 +176,7 @@ export class Server {
 
     // === Server initialization ===
 
-    let root = new koa();
+    const root = new koa();
     root.name = app.name;
     root.proxy = true;
     root.use(convert(cors()));

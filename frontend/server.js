@@ -13,7 +13,7 @@ export class Server {
   }
 
   start() {
-    let root = new koa();
+    const root = new koa();
     root.name = this.app.name;
     root.proxy = true;
 
@@ -30,7 +30,7 @@ export class Server {
 
     root.use(convert(rewrite('/', '/index.html')));
 
-    let development = this.app.environment === 'development';
+    const development = this.app.environment === 'development';
     root.use(convert(staticCache(this.path, {
       buffer: !development,
       gzip: !development,

@@ -7,7 +7,7 @@ export function Common(component) {
   if (!component.contextTypes) component.contextTypes = {};
   component.contextTypes.app = React.PropTypes.object.isRequired;
 
-  let originalComponentWillMount = component.prototype.componentWillMount;
+  const originalComponentWillMount = component.prototype.componentWillMount;
   component.prototype.componentWillMount = function() {
     this.app = this.context.app;
     if (originalComponentWillMount) originalComponentWillMount.call(this);

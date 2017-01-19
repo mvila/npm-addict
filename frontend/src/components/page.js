@@ -23,7 +23,7 @@ export class Page extends React.Component {
   }
 
   render() {
-    let s = this.styles;
+    const s = this.styles;
 
     let component;
     switch (this.app.currentPage) {
