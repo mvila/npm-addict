@@ -109,6 +109,10 @@ class Application extends BackendApplication {
       case 'fix2':
         result = await this.fix2();
         break;
+      // node backend fix3 --no-aws-cloud-watch-logs --no-slack-notifications &> fix3.log &
+      case 'fix3':
+        result = await this.fix3();
+        break;
       default:
         throw new Error(`Unknown command '${command}'`);
     }
@@ -328,6 +332,7 @@ class Application extends BackendApplication {
         console.log(`'${pkg.name}' package has been fixed`);
       }
     });
+    console.log('fix1 completed');
   }
 
   async fix2() {
@@ -337,6 +342,28 @@ class Application extends BackendApplication {
         console.log(`'${pkg.name}' package has been deleted`);
       }
     });
+    console.log('fix2 completed');
+  }
+
+  async fix3() {
+    let refetcher = new Fetcher(this, true);
+    let count = 0;
+    let unfixedCount = 0;
+    let fixedCount = 0;
+    await this.store.Package.forEach({ batchSize: 1000 }, async (pkg) => {
+      count++;
+      if (pkg.gitHubResult && !pkg.gitHubPackageJSON) {
+        let newPkg = await refetcher.createOrUpdatePackage(pkg.name);
+        const fixed = newPkg && !!newPkg.gitHubPackageJSON;
+        if (fixed) {
+          fixedCount++;
+        } else {
+          unfixedCount++;
+        }
+        this.log.info(`'${pkg.name}' package ${fixed ? 'fixed' : 'unfixed'} (${fixedCount}/${unfixedCount}/${count})`);
+      }
+    });
+    console.log('fix3 completed');
   }
 }
 
