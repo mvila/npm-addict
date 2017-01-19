@@ -19,6 +19,7 @@ export class Package extends Model {
   @field(String) gitHubURL;
   @field(Number) gitHubStars;
   @field(Object) gitHubPackageJSON;
+  @field(String) gitHubPackageJSONPath;
   @field(Boolean) visible; // DEPRECATED
   @field(Boolean) forced; // DEPRECATED
   @field(Boolean) revealed;

@@ -117,7 +117,7 @@ export class Fetcher {
   async createOrUpdatePackage(name, prefetchedNPMResult) {
     let item = await this.app.store.Package.getByName(name);
     if (!item) item = new this.app.store.Package();
-    let pkg = await this.fetchPackage(name, prefetchedNPMResult);
+    let pkg = await this.fetchPackage(name, item, prefetchedNPMResult);
     if (!pkg) return undefined;
     Object.assign(item, pkg);
     let hasBeenRevealed = false;
@@ -146,7 +146,7 @@ export class Fetcher {
     this.app.log.info(`'${name}' package deleted`);
   }
 
-  async fetchPackage(name, prefetchedNPMResult) {
+  async fetchPackage(name, currentPackage, prefetchedNPMResult) {
     try {
       let ignoredPackage = await this.app.store.IgnoredPackage.getByName(name);
       if (ignoredPackage) {
@@ -203,7 +203,7 @@ export class Fetcher {
           parsedGitHubURL = parseGitHubURL(npmResult.repository);
           if (parsedGitHubURL) {
             gitHubURL = parsedGitHubURL.https_url;
-            gitHubResult = await this.fetchGitHubRepository(parsedGitHubURL);
+            gitHubResult = await this.fetchGitHubRepository(parsedGitHubURL.user, parsedGitHubURL.repo);
           } else {
             this.app.log.debug(`'${name}' package has an invalid GitHub URL (${npmResult.repository})`);
           }
@@ -214,10 +214,12 @@ export class Fetcher {
         this.app.log.debug(`'${name}' package doesn't have a respository field`);
       }
 
-      let gitHubStars, gitHubPackageJSON;
+      let gitHubStars, gitHubPackageJSON, gitHubPackageJSONPath;
       if (gitHubResult) {
-        gitHubPackageJSON = await this.getGitHubPackageJSON(name, parsedGitHubURL.user, parsedGitHubURL.repo);
-        if (gitHubPackageJSON) {
+        const result = await this.getGitHubPackageJSON(name, parsedGitHubURL.user, parsedGitHubURL.repo, currentPackage && currentPackage.gitHubPackageJSONPath);
+        if (result) {
+          gitHubPackageJSON = result.pkg;
+          gitHubPackageJSONPath = result.path;
           gitHubStars = gitHubResult.stargazers_count;
         }
       }
@@ -247,6 +249,7 @@ export class Fetcher {
         gitHubURL,
         gitHubStars,
         gitHubPackageJSON,
+        gitHubPackageJSONPath,
         npmResult,
         gitHubResult
       };
@@ -256,24 +259,26 @@ export class Fetcher {
     }
   }
 
-  async fetchGitHubRepository({ user, repo }) {
+  async fetchGitHubRepository(gitHubUser, gitHubRepo) {
     try {
-      let url = `${this.gitHubAPIURL}repos/${user}/${repo}`;
+      let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}`;
       return await this.requestGitHubAPI(url);
     } catch (err) {
-      this.app.log.warning(`An error occured while fetching '${user}/${repo}' repository from GitHub API (${err.message})`);
+      this.app.log.warning(`An error occured while fetching '${gitHubUser}/${gitHubRepo}' repository from GitHub API (${err.message})`);
       return undefined;
     }
   }
 
-  async getGitHubPackageJSON(packageName, gitHubUser, gitHubRepo) {
+  async getGitHubPackageJSON(packageName, gitHubUser, gitHubRepo, previousPath) {
     try {
-      let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/package.json`;
+      const defaultPath = previousPath || 'package.json';
+      let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/${defaultPath}`;
       let pkg = await this.getGitHubJSONFile(url);
-      if (pkg && pkg.name === packageName) return pkg;
+      if (pkg && pkg.name === packageName) return { pkg, path: defaultPath };
 
       // There is no correct package.json at the root of the repository,
       // let's try to find one in the rest of the repository
+      this.app.log.debug(`Searching a correct package.json file for '${packageName}' package...`);
       url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/git/trees/master?recursive=1`;
       let result = await this.requestGitHubAPI(url);
       if (!result) return undefined;
@@ -282,15 +287,24 @@ export class Fetcher {
         this.app.log.warning(message);
         this.app.notifier.notify(message);
       }
+      let count = 0;
       for (const entry of result.tree) {
         if (entry.type !== 'blob') continue;
         const path = entry.path;
-        if (path === 'package.json') continue; // package.json file at root has already been fetched
+        if (path === defaultPath) continue; // Default path has already been fetched
+        if (path.includes('node_modules/')) continue;
         if (!path.endsWith('/package.json')) continue;
         let pkg = await this.getGitHubJSONFile(entry.url);
         if (pkg && pkg.name === packageName) {
           this.app.log.debug(`Correct package.json file found for package '${packageName}' at ${path}`);
-          return pkg;
+          return { pkg, path };
+        }
+        count++;
+        if (count >= 30) {
+          const message = `After fetching 30 package.json, no correct file found for '${packageName}' package`;
+          this.app.log.warning(message);
+          this.app.notifier.notify(message);
+          return undefined;
         }
       }
       return undefined;
