@@ -75,6 +75,7 @@
     "rimraf": "^2.5.4",
     "rss": "^1.2.2",
     "sleep-promise": "^2.0.0",
+    "strict-uri-encode": "^2.0.0",
     "twit": "^2.2.5",
     "uglify-js": "^2.7.5",
     "universal-analytics": "^0.4.8",

@@ -1,10 +1,14 @@
 'use strict';
 
+import fs from 'fs';
+import pathModule from 'path';
 import fetch from 'isomorphic-fetch';
 import ChangesStream from 'changes-stream';
 import Package from 'nice-package';
 import parseGitHubURL from 'github-url-to-object';
 import sleep from 'sleep-promise';
+import mkdirp from 'mkdirp';
+import strictUriEncode from 'strict-uri-encode';
 // let stripMarkdown = require('remark').use(require('strip-markdown'));
 
 const FETCH_TIMEOUT = 3 * 60 * 1000; // 3 minutes
@@ -24,6 +28,9 @@ export class Fetcher {
       throw new Error('GITHUB_PERSONAL_ACCESS_TOKEN environment variable is missing');
     }
     this.gitHubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
+
+    this.cacheDir = `/tmp/${this.app.name}/cache`;
+    mkdirp.sync(this.cacheDir);
   }
 
   async run() {
@@ -310,14 +317,15 @@ export class Fetcher {
         if (path === defaultPath) continue; // Default path has already been fetched
         if (path.includes('node_modules/')) continue;
         if (!path.endsWith('/package.json')) continue;
-        const pkg = await this.getGitHubJSONFile(entry.url);
+        const pkg = await this.getGitHubJSONFile(entry.url, true);
         if (pkg && pkg.name === packageName) {
           this.app.log.debug(`Correct package.json file found for package '${packageName}' at ${path}`);
           return { pkg, path };
         }
+        await sleep(750);
         count++;
-        if (count >= 30) {
-          const message = `After fetching 30 package.json, no correct file found for '${packageName}' package`;
+        if (count >= 150) {
+          const message = `After fetching 150 package.json, no correct file found for '${packageName}' package`;
           this.app.log.warning(message);
           await this.app.notifyOnce(`${packageName}-has-too-many-package-json-files`, `'${packageName}' package has too many package.json files`);
           return undefined;
@@ -330,15 +338,30 @@ export class Fetcher {
     }
   }
 
-  async getGitHubJSONFile(url) {
-    const file = await this.requestGitHubAPI(url);
-    if (!file) return false;
-    if (file.encoding !== 'base64') {
-      this.app.log.warning(`Unsupported GitHub file encoding found while fetching a file (${url}) from GitHub`);
-      return undefined;
+  async getGitHubJSONFile(url, useCache) {
+    const cachePath = useCache ? pathModule.join(this.cacheDir, strictUriEncode(url)) : undefined;
+    let json;
+
+    if (cachePath) {
+      if (fs.existsSync(cachePath)) {
+        json = fs.readFileSync(cachePath, 'utf8');
+      }
     }
-    let json = file.content;
-    json = new Buffer(json, 'base64').toString();
+
+    if (json == null) {
+      const file = await this.requestGitHubAPI(url);
+      if (!file) return false;
+      if (file.encoding !== 'base64') {
+        this.app.log.warning(`Unsupported GitHub file encoding found while fetching a file (${url}) from GitHub`);
+        return undefined;
+      }
+      json = file.content;
+      json = new Buffer(json, 'base64').toString();
+      if (cachePath) {
+        fs.writeFileSync(cachePath, json);
+      }
+    }
+
     try {
       const result = JSON.parse(json);
       return result;

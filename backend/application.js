@@ -45,7 +45,7 @@ class Application extends BackendApplication {
 
     const command = this.argv._[0];
     if (!command) throw new Error('Command is missing');
-    let name;
+    let name, start;
     switch (command) {
       case 'start':
         let fetch = this.argv.fetch;
@@ -54,7 +54,7 @@ class Application extends BackendApplication {
         break;
       case 'refetch':
         // node backend refetch --start=0 --no-aws-cloud-watch-logs --no-slack-notifications &> refetch.log &
-        let start = 0;
+        start = 0;
         if (this.argv.start) start = Number(this.argv.start);
         result = await this.refetch(start);
         break;
@@ -111,7 +111,9 @@ class Application extends BackendApplication {
         break;
       // node backend fix3 --no-aws-cloud-watch-logs --no-slack-notifications &> fix3.log &
       case 'fix3':
-        result = await this.fix3();
+        start = 1;
+        if (this.argv.start) start = Number(this.argv.start);
+        result = await this.fix3(start);
         break;
       default:
         throw new Error(`Unknown command '${command}'`);
@@ -345,13 +347,14 @@ class Application extends BackendApplication {
     console.log('fix2 completed');
   }
 
-  async fix3() {
+  async fix3(start) {
     const refetcher = new Fetcher(this, true);
     let count = 0;
     let unfixedCount = 0;
     let fixedCount = 0;
     await this.store.Package.forEach({ batchSize: 1000 }, async (pkg) => {
       count++;
+      if (count < start) return;
       if (pkg.gitHubResult && !pkg.gitHubPackageJSON) {
         const newPkg = await refetcher.createOrUpdatePackage(pkg.name);
         const fixed = newPkg && !!newPkg.gitHubPackageJSON;
