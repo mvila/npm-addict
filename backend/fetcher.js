@@ -216,7 +216,23 @@ export class Fetcher {
 
       let gitHubStars, gitHubPackageJSON, gitHubPackageJSONPath;
       if (gitHubResult) {
-        const result = await this.getGitHubPackageJSON(name, parsedGitHubURL.user, parsedGitHubURL.repo, currentPackage && currentPackage.gitHubPackageJSONPath);
+        let defaultPath = currentPackage && currentPackage.gitHubPackageJSONPath;
+        if (!defaultPath) {
+          defaultPath = 'package.json';
+          let path = parsedGitHubURL.path;
+          if (path) {
+            if (path.startsWith('/tree/master/')) {
+              path = path.slice('/tree/master/'.length);
+            } else {
+              const message = `'path' attribute doesn't start with '/tree/master' for '${name}' package (path: ${path})`;
+              this.app.log.warning(message);
+              await this.app.notifyOnce(`${name}-path-doesnt-start-with-tree-master`, message);
+            }
+            if (path.endsWith('/')) path = path.slice(0, -1);
+            defaultPath = path + '/' + defaultPath;
+          }
+        }
+        const result = await this.getGitHubPackageJSON(name, parsedGitHubURL.user, parsedGitHubURL.repo, defaultPath);
         if (result) {
           gitHubPackageJSON = result.pkg;
           gitHubPackageJSONPath = result.path;
@@ -269,12 +285,12 @@ export class Fetcher {
     }
   }
 
-  async getGitHubPackageJSON(packageName, gitHubUser, gitHubRepo, previousPath) {
+  async getGitHubPackageJSON(packageName, gitHubUser, gitHubRepo, defaultPath) {
     try {
-      const defaultPath = previousPath || 'package.json';
-      let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/${defaultPath}`;
+      let path = defaultPath;
+      let url = `${this.gitHubAPIURL}repos/${gitHubUser}/${gitHubRepo}/contents/${path}`;
       const pkg = await this.getGitHubJSONFile(url);
-      if (pkg && pkg.name === packageName) return { pkg, path: defaultPath };
+      if (pkg && pkg.name === packageName) return { pkg, path };
 
       // There is no correct package.json at the root of the repository,
       // let's try to find one in the rest of the repository
@@ -290,7 +306,7 @@ export class Fetcher {
       let count = 0;
       for (const entry of result.tree) {
         if (entry.type !== 'blob') continue;
-        const path = entry.path;
+        path = entry.path;
         if (path === defaultPath) continue; // Default path has already been fetched
         if (path.includes('node_modules/')) continue;
         if (!path.endsWith('/package.json')) continue;
@@ -303,7 +319,7 @@ export class Fetcher {
         if (count >= 30) {
           const message = `After fetching 30 package.json, no correct file found for '${packageName}' package`;
           this.app.log.warning(message);
-          this.app.notifier.notify(message);
+          await this.app.notifyOnce(`${packageName}-has-too-many-package-json-files`, `'${packageName}' package has too many package.json files`);
           return undefined;
         }
       }

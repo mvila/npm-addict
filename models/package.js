@@ -55,18 +55,18 @@ export class Package extends Model {
     const notifier = this.context.notifier;
 
     if (!this.createdOn) {
-      log.info(`'${this.name}' package doesn't have a creation date`);
+      log.debug(`'${this.name}' package cannot be revealed because it doesn't have a creation date`);
       return false;
     }
 
-    const minimumDate = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000); // 6 months
+    const minimumDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 3 months
     if (this.createdOn < minimumDate) {
-      log.info(`'${this.name}' package was created too long ago (creation date: ${this.createdOn.toISOString()})`);
+      log.debug(`'${this.name}' package cannot be revealed because it was created too long ago (creation date: ${this.createdOn.toISOString()})`);
       return false;
     }
 
     if (!this.description) {
-      log.info(`'${this.name}' package doesn't have a description`);
+      log.debug(`'${this.name}' package cannot be revealed because it doesn't have a description`);
       return false;
     }
 
@@ -79,20 +79,20 @@ export class Package extends Model {
 
     if (this.gitHubStars == null) return false;
     if (this.gitHubStars < this.context.minimumGitHubStars) {
-      log.info(`'${this.name}' package has not enough stars (${this.gitHubStars} of ${this.context.minimumGitHubStars})`);
+      log.debug(`'${this.name}' package cannot be revealed because it has not enough stars (${this.gitHubStars} of ${this.context.minimumGitHubStars})`);
       return false;
     }
 
     const readme = this.npmResult.readme;
     if (!readme) {
-      log.info(`'${this.name}' package doesn't have a README`);
+      log.debug(`'${this.name}' package cannot be revealed because it doesn't have a README`);
       return false;
     }
 
     if (hasChinese(readme)) {
       // I am very sorry Chinese guys, you must document your package in English
       // to be listed on npm addict
-      log.info(`'${this.name}' package contains Chinese characters`);
+      log.debug(`'${this.name}' package cannot be revealed because the README contains Chinese characters`);
       // notifier.notify(`'${this.name}' package contains Chinese characters (${this.npmURL})`);
       return false;
     }
