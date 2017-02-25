@@ -109,7 +109,7 @@ class Application extends BackendApplication {
       case 'fix2':
         result = await this.fix2();
         break;
-      // node backend fix3 --no-aws-cloud-watch-logs --no-slack-notifications &> fix3.log &
+      // node backend fix3 --start=1 --no-aws-cloud-watch-logs --no-slack-notifications &> fix3.log &
       case 'fix3':
         start = 1;
         if (this.argv.start) start = Number(this.argv.start);
