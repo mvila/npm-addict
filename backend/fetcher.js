@@ -74,6 +74,10 @@ export class Fetcher {
         changes.resume();
       }
     });
+
+    changes.on('error', err => {
+      this.app.log.error(err);
+    });
   }
 
   refetch(startSeq = 0) {
