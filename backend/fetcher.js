@@ -47,6 +47,12 @@ export class Fetcher {
       this.app.log.info(`'lastRegistryUpdateSeq' setted to ${this.app.state.lastRegistryUpdateSeq}`);
     }
 
+    this.listenChanges();
+  }
+
+  listenChanges() {
+    let isRunning = true;
+
     this.app.log.info(`Listening registry changes (lastRegistryUpdateSeq: ${this.app.state.lastRegistryUpdateSeq})`);
 
     const changes = new ChangesStream({
@@ -56,6 +62,7 @@ export class Fetcher {
     });
 
     changes.on('readable', async () => {
+      if (!isRunning) return;
       const change = changes.read();
       changes.pause();
       try {
@@ -77,6 +84,12 @@ export class Fetcher {
 
     changes.on('error', err => {
       this.app.log.error(err);
+      if (!isRunning) return;
+      isRunning = false;
+      setTimeout(() => {
+        this.listenChanges();
+      }, 60 * 1000); // 1 minute
+      changes.destroy();
     });
   }
 
