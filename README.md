@@ -1,6 +1,6 @@
 # npm addict
 
-This is the complete source code of the [npm addict website](https://npmaddict.com/).
+This is the complete source code of [npm addict](https://npmaddict.com/).
 
 Feel free to do whatever you want with it.
 
