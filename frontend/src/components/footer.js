@@ -11,8 +11,8 @@ export class Footer extends React.Component {
       <footer style={{ flexShrink: 0, textAlign: 'center', fontSize: this.theme.smallFontSize }}>
         <div>
           <a href={'#/feeds'}>RSS feeds</a>
-          {separator}
-          <a href='https://twitter.com/npmaddict'>Twitter</a>
+          {/* {separator}
+          <a href='https://twitter.com/npmaddict'>Twitter</a> */}
           {separator}
           <a href='https://github.com/mvila/npm-addict'>GitHub</a>
         </div>

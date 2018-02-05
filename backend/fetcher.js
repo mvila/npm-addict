@@ -158,7 +158,8 @@ export class Fetcher {
     this.app.log.info(`'${name}' package ${wasNew ? 'added' : 'updated'}`);
     if (hasBeenRevealed) {
       this.app.log.info(`'${name}' package revealed`);
-      await this.app.tweet(item);
+      // Twitter posting is currenlty disabled
+      // await this.app.tweet(item);
     }
     return item;
   }
