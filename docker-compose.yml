@@ -1,0 +1,34 @@
+version: "3"
+networks:
+  public:
+    external: true
+services:
+  npm-addict:
+    image: mvila/npm-addict:production
+    restart: always
+    container_name: npm-addict
+    hostname: host1
+    environment:
+      - STORE_URL
+      - GITHUB_PERSONAL_ACCESS_TOKEN
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_REGION
+      - SLACK_INCOMING_WEBHOOK_URL
+      - SLACK_INCOMING_WEBHOOK_CHANNEL
+      - TWITTER_CONSUMER_KEY
+      - TWITTER_CONSUMER_SECRET
+      - TWITTER_ACCESS_TOKEN
+      - TWITTER_ACCESS_TOKEN_SECRET
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=public
+      - traefik.website.backend=npm-addict-website
+      - traefik.website.frontend.rule=Host:npmaddict.com
+      - traefik.website.port=8832
+      - traefik.api.backend=npm-addict-api
+      - traefik.api.frontend.rule=Host:api.npmaddict.com
+      - traefik.api.port=8831
+      - com.centurylinklabs.watchtower.enable=true
+    networks:
+      - public
