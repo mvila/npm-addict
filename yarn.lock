@@ -1917,8 +1917,8 @@ expand-range@^1.8.1:
     fill-range "^2.1.0"
 
 extend@~3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.0.tgz#5a474353b9f3353ddd8176dfd37b91c83a46f1d4"
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
 
 extglob@^0.3.1:
   version "0.3.2"
@@ -3283,7 +3283,7 @@ normalize-path@^2.0.1:
 
 normalize-registry-metadata@^1.1.2:
   version "1.1.2"
-  resolved "http://registry.npmjs.org/normalize-registry-metadata/-/normalize-registry-metadata-1.1.2.tgz#a4a4751623d2f695c4f7b3b9a6c2e6a39b3ff94e"
+  resolved "https://registry.npmjs.org/normalize-registry-metadata/-/normalize-registry-metadata-1.1.2.tgz#a4a4751623d2f695c4f7b3b9a6c2e6a39b3ff94e"
   dependencies:
     semver "^5.1.0"
 
@@ -4441,7 +4441,7 @@ uid-number@~0.0.6:
 
 umd@^3.0.0:
   version "3.0.1"
-  resolved "http://registry.npmjs.org/umd/-/umd-3.0.1.tgz#8ae556e11011f63c2596708a8837259f01b3d60e"
+  resolved "https://registry.npmjs.org/umd/-/umd-3.0.1.tgz#8ae556e11011f63c2596708a8837259f01b3d60e"
 
 undefsafe@0.0.3:
   version "0.0.3"
