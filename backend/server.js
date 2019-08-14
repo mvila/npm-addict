@@ -1,6 +1,5 @@
 'use strict';
 
-import assert from 'assert';
 import koa from 'koa';
 import convert from 'koa-convert';
 import cors from 'koa-cors';
@@ -67,9 +66,8 @@ export class Server {
     // curl -v http://api.dev.npmaddict.com:20576/v1/health-check
     router.get('/health-check', async function(ctx) {
       let time = Date.now();
-      const packages = await app.store.Package.find({limit: 1});
+      await app.store.BackendState.get('BackendState', { errorIfMissing: false });
       time = Date.now() - time;
-      assert.ok(packages.length === 1, 'There should be at least one package.');
       ctx.logLevel = 'silence';
       ctx.body = `OK (${time} ms)`;
     });
