@@ -3011,8 +3011,8 @@ marked-terminal@^1.6.2:
     node-emoji "^1.4.1"
 
 marked@^0.3.6:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
+  version "0.3.19"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
 
 math-expression-evaluator@^1.2.14:
   version "1.2.14"
@@ -3283,7 +3283,7 @@ normalize-path@^2.0.1:
 
 normalize-registry-metadata@^1.1.2:
   version "1.1.2"
-  resolved "http://registry.npmjs.org/normalize-registry-metadata/-/normalize-registry-metadata-1.1.2.tgz#a4a4751623d2f695c4f7b3b9a6c2e6a39b3ff94e"
+  resolved "https://registry.npmjs.org/normalize-registry-metadata/-/normalize-registry-metadata-1.1.2.tgz#a4a4751623d2f695c4f7b3b9a6c2e6a39b3ff94e"
   dependencies:
     semver "^5.1.0"
 
@@ -4441,7 +4441,7 @@ uid-number@~0.0.6:
 
 umd@^3.0.0:
   version "3.0.1"
-  resolved "http://registry.npmjs.org/umd/-/umd-3.0.1.tgz#8ae556e11011f63c2596708a8837259f01b3d60e"
+  resolved "https://registry.npmjs.org/umd/-/umd-3.0.1.tgz#8ae556e11011f63c2596708a8837259f01b3d60e"
 
 undefsafe@0.0.3:
   version "0.0.3"
