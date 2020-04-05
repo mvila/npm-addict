@@ -3087,9 +3087,9 @@ minimist@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.8.tgz#857fcabfc3397d2625b8228262e86aa7a011b05d"
 
-minimist@^1.1.0, minimist@^1.1.1, minimist@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
+minimist@^1.1.0, minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.3.tgz#3db5c0765545ab8637be71f333a104a965a9ca3f"
 
 minimist@~0.0.1:
   version "0.0.10"
@@ -3283,7 +3283,7 @@ normalize-path@^2.0.1:
 
 normalize-registry-metadata@^1.1.2:
   version "1.1.2"
-  resolved "http://registry.npmjs.org/normalize-registry-metadata/-/normalize-registry-metadata-1.1.2.tgz#a4a4751623d2f695c4f7b3b9a6c2e6a39b3ff94e"
+  resolved "https://registry.npmjs.org/normalize-registry-metadata/-/normalize-registry-metadata-1.1.2.tgz#a4a4751623d2f695c4f7b3b9a6c2e6a39b3ff94e"
   dependencies:
     semver "^5.1.0"
 
@@ -4441,7 +4441,7 @@ uid-number@~0.0.6:
 
 umd@^3.0.0:
   version "3.0.1"
-  resolved "http://registry.npmjs.org/umd/-/umd-3.0.1.tgz#8ae556e11011f63c2596708a8837259f01b3d60e"
+  resolved "https://registry.npmjs.org/umd/-/umd-3.0.1.tgz#8ae556e11011f63c2596708a8837259f01b3d60e"
 
 undefsafe@0.0.3:
   version "0.0.3"
