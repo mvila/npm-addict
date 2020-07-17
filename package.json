@@ -62,7 +62,7 @@
     "koa-rewrite": "^1.1.1",
     "koa-router": "^7.1.0",
     "koa-static-cache": "^3.2.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.19",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "moment": "^2.17.1",
