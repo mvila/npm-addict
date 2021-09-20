@@ -58,6 +58,10 @@ class Application extends BackendApplication {
         if (this.argv.start) start = Number(this.argv.start);
         result = await this.refetch(start);
         break;
+      case 'reset-registry-update-seq':
+        this.state.lastRegistryUpdateSeq = undefined;
+        await this.state.save();
+        break;
       case 'stats':
         result = await this.stats();
         break;
