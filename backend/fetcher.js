@@ -61,25 +61,28 @@ export class Fetcher {
       'include_docs': true
     });
 
-    changes.on('readable', async () => {
+    changes.on('readable', () => {
       if (!isRunning) return;
       const change = changes.read();
       changes.pause();
-      try {
-        this.app.log.trace(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
-        if (change.deleted) {
-          await this.deletePackage(change.id);
-        } else {
-          const pkg = await this.createOrUpdatePackage(change.id, change.doc);
-          if (pkg && (this.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
-            this.app.state.lastUpdateDate = pkg.updatedOn;
+
+      (async () => {
+        try {
+          this.app.log.debug(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
+          if (change.deleted) {
+            await this.deletePackage(change.id);
+          } else {
+            const pkg = await this.createOrUpdatePackage(change.id, change.doc);
+            if (pkg && (this.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
+              this.app.state.lastUpdateDate = pkg.updatedOn;
+            }
           }
+          this.app.state.lastRegistryUpdateSeq = change.seq;
+          await this.app.state.save();
+        } finally {
+          changes.resume();
         }
-        this.app.state.lastRegistryUpdateSeq = change.seq;
-        await this.app.state.save();
-      } finally {
-        changes.resume();
-      }
+      })();
     });
 
     changes.on('error', err => {
