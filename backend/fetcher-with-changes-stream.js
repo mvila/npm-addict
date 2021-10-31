@@ -4,7 +4,6 @@ import fs from 'fs';
 import pathModule from 'path';
 import fetch from 'isomorphic-fetch';
 import ChangesStream from 'changes-stream';
-import nano from 'nano';
 import Package from 'nice-package';
 import parseGitHubURL from 'github-url-to-object';
 import sleep from 'sleep-promise';
@@ -32,8 +31,6 @@ export class Fetcher {
 
     this.cacheDir = `/tmp/${this.app.name}/cache`;
     mkdirp.sync(this.cacheDir);
-
-    this.db = nano(this.npmRegistryURL);
   }
 
   async run() {
@@ -54,16 +51,22 @@ export class Fetcher {
   }
 
   listenChanges() {
+    let isRunning = true;
+
     this.app.log.info(`Listening registry changes (lastRegistryUpdateSeq: ${this.app.state.lastRegistryUpdateSeq})`);
 
-    const emitter = this.db.changesReader.start({
+    const changes = new ChangesStream({
+      db: this.npmRegistryURL,
       since: this.app.state.lastRegistryUpdateSeq,
-      includeDocs: true,
-      wait: true
+      'include_docs': true
     });
 
-    emitter.on('batch', async (changes) => {
-      for (const change of changes) {        
+    changes.on('readable', () => {
+      if (!isRunning) return;
+      const change = changes.read();
+      changes.pause();
+
+      (async () => {
         try {
           this.app.log.debug(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
           if (change.deleted) {
@@ -76,20 +79,20 @@ export class Fetcher {
           }
           this.app.state.lastRegistryUpdateSeq = change.seq;
           await this.app.state.save();
-        } catch (error) {
-          this.app.log.error(error);
+        } finally {
+          changes.resume();
         }
-      }
-
-      this.db.changesReader.resume();
+      })();
     });
 
-    emitter.on('error', (error) => {
-      this.app.log.error(error);
-
+    changes.on('error', err => {
+      this.app.log.error(err);
+      if (!isRunning) return;
+      isRunning = false;
       setTimeout(() => {
         this.listenChanges();
       }, 60 * 1000); // 1 minute
+      changes.destroy();
     });
   }
 

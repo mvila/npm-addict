@@ -9,6 +9,7 @@ import denodeify from 'denodeify';
 import ncpModule from 'ncp';
 const ncp = denodeify(ncpModule.ncp);
 import UglifyJS from 'uglify-js';
+import { minify } from 'terser';
 import browserify from 'browserify';
 import babelify from 'babelify';
 
@@ -228,7 +229,7 @@ export class Builder {
     const bundle = async function() {
       let output = await _bundle();
       if (this.app.environment !== 'development') {
-        output = (UglifyJS.minify(output.toString(), { fromString: true })).code;
+        output = (await minify(output.toString(), {'keep_classnames': true})).code;
       }
       const outputDir = pathModule.join(this.targetDir, this.scriptsDirname || '');
       const outputPath = pathModule.join(outputDir, this.browserifiedAppScriptFilename);

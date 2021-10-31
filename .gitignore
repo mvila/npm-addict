@@ -1,5 +1,6 @@
 .DS_Store
 node_modules
+node_modules.disabled
 npm-debug.log
 lib
 notes.js
@@ -7,3 +8,4 @@ data
 frontend/dist
 env
 run.js
+README.private.md

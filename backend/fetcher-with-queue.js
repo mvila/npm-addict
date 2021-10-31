@@ -4,7 +4,6 @@ import fs from 'fs';
 import pathModule from 'path';
 import fetch from 'isomorphic-fetch';
 import ChangesStream from 'changes-stream';
-import nano from 'nano';
 import Package from 'nice-package';
 import parseGitHubURL from 'github-url-to-object';
 import sleep from 'sleep-promise';
@@ -30,10 +29,10 @@ export class Fetcher {
     }
     this.gitHubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 
+    this.changeQueue = [];
+
     this.cacheDir = `/tmp/${this.app.name}/cache`;
     mkdirp.sync(this.cacheDir);
-
-    this.db = nano(this.npmRegistryURL);
   }
 
   async run() {
@@ -56,41 +55,74 @@ export class Fetcher {
   listenChanges() {
     this.app.log.info(`Listening registry changes (lastRegistryUpdateSeq: ${this.app.state.lastRegistryUpdateSeq})`);
 
-    const emitter = this.db.changesReader.start({
+    this._changesStream = new ChangesStream({
+      db: this.npmRegistryURL,
       since: this.app.state.lastRegistryUpdateSeq,
-      includeDocs: true,
-      wait: true
+      'include_docs': true
     });
 
-    emitter.on('batch', async (changes) => {
-      for (const change of changes) {        
-        try {
-          this.app.log.debug(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
-          if (change.deleted) {
-            await this.deletePackage(change.id);
-          } else {
-            const pkg = await this.createOrUpdatePackage(change.id, change.doc);
-            if (pkg && (this.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
-              this.app.state.lastUpdateDate = pkg.updatedOn;
-            }
-          }
-          this.app.state.lastRegistryUpdateSeq = change.seq;
-          await this.app.state.save();
-        } catch (error) {
-          this.app.log.error(error);
-        }
-      }
-
-      this.db.changesReader.resume();
+    this._changesStream.on('readable', () => {
+      if (!this._changesStream) return;
+      const change = this._changesStream.read();
+      this.queueChange(change);
     });
 
-    emitter.on('error', (error) => {
-      this.app.log.error(error);
-
+    this._changesStream.on('error', err => {
+      this.app.log.error(err);
+      if (!this._changesStream) return;
+      this._changesStream.destroy();
+      this._changesStream = undefined;
       setTimeout(() => {
         this.listenChanges();
       }, 60 * 1000); // 1 minute
     });
+  }
+
+  queueChange(change) {
+    this.changeQueue.push(change);
+    this.app.log.debug(`Registry change queued (id: \"${change.id}\", seq: ${change.seq}, queue length: ${this.changeQueue.length})`);
+    this._handleChanges();
+  }
+
+  _handleChanges() {
+    if (this._isHandlingChange) {
+      return;
+    }
+
+    this._isHandlingChange = true;
+
+    if (this._changesStream) {
+      this._changesStream.pause();
+    }
+
+    (async () => {
+      try {
+        while (this.changeQueue.length > 0) {
+          const change = this.changeQueue.shift();
+          try {            
+            this.app.log.debug(`Handling registry change (id: \"${change.id}\", seq: ${change.seq})...`);
+            if (change.deleted) {
+              await this.deletePackage(change.id);
+            } else {
+              const pkg = await this.createOrUpdatePackage(change.id, change.doc);
+              if (pkg && (this.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
+                this.app.state.lastUpdateDate = pkg.updatedOn;
+              }
+            }
+            this.app.state.lastRegistryUpdateSeq = change.seq;
+            await this.app.state.save();
+          } catch (err) {
+            this.app.log.error(err);
+          }
+        }
+      } finally {
+        if (this._changesStream) {
+          this._changesStream.resume();
+        }
+
+        this._isHandlingChange = false;
+      }
+    })();
   }
 
   refetch(startSeq = 0) {

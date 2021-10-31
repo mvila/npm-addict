@@ -4,7 +4,7 @@ import fs from 'fs';
 import pathModule from 'path';
 import fetch from 'isomorphic-fetch';
 import ChangesStream from 'changes-stream';
-import nano from 'nano';
+import follow from 'follow';
 import Package from 'nice-package';
 import parseGitHubURL from 'github-url-to-object';
 import sleep from 'sleep-promise';
@@ -32,8 +32,6 @@ export class Fetcher {
 
     this.cacheDir = `/tmp/${this.app.name}/cache`;
     mkdirp.sync(this.cacheDir);
-
-    this.db = nano(this.npmRegistryURL);
   }
 
   async run() {
@@ -56,44 +54,49 @@ export class Fetcher {
   listenChanges() {
     this.app.log.info(`Listening registry changes (lastRegistryUpdateSeq: ${this.app.state.lastRegistryUpdateSeq})`);
 
-    const emitter = this.db.changesReader.start({
-      since: this.app.state.lastRegistryUpdateSeq,
-      includeDocs: true,
-      wait: true
-    });
+    const fetcher = this;
 
-    emitter.on('batch', async (changes) => {
-      for (const change of changes) {        
-        try {
-          this.app.log.debug(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
-          if (change.deleted) {
-            await this.deletePackage(change.id);
-          } else {
-            const pkg = await this.createOrUpdatePackage(change.id, change.doc);
-            if (pkg && (this.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
-              this.app.state.lastUpdateDate = pkg.updatedOn;
-            }
-          }
-          this.app.state.lastRegistryUpdateSeq = change.seq;
-          await this.app.state.save();
-        } catch (error) {
-          this.app.log.error(error);
+    follow(
+      {
+        db: this.npmRegistryURL,
+        since: this.app.state.lastRegistryUpdateSeq,
+        'include_docs': true,
+        'max_retry_seconds': 60
+      },
+      function(error, change) {
+        if (error) {
+          fetcher.app.log.error(error);
+          return;
         }
+
+        this.pause();
+
+        (async () => {
+          try {
+            fetcher.app.log.debug(`Registry change received (id: \"${change.id}\", seq: ${change.seq})`);
+            if (change.deleted) {
+              await fetcher.deletePackage(change.id);
+            } else {
+              const pkg = await fetcher.createOrUpdatePackage(change.id, change.doc);
+              if (pkg && (fetcher.app.state.lastUpdateDate || 0) < pkg.updatedOn) {
+                fetcher.app.state.lastUpdateDate = pkg.updatedOn;
+              }
+            }
+            fetcher.app.state.lastRegistryUpdateSeq = change.seq;
+            await fetcher.app.state.save();
+          } catch (error) {
+            fetcher.app.log.error(error);
+          } finally {
+            this.resume();
+          }
+        })();
       }
-
-      this.db.changesReader.resume();
-    });
-
-    emitter.on('error', (error) => {
-      this.app.log.error(error);
-
-      setTimeout(() => {
-        this.listenChanges();
-      }, 60 * 1000); // 1 minute
-    });
+    );
   }
 
   refetch(startSeq = 0) {
+    // TODO: Rewrite using 'follow' instead of 'changes-stream'
+
     return new Promise((resolve, reject) => {
       try {
         const endSeq = this.app.state.lastRegistryUpdateSeq;
