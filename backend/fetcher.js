@@ -32,8 +32,6 @@ export class Fetcher {
 
     this.cacheDir = `/tmp/${this.app.name}/cache`;
     mkdirp.sync(this.cacheDir);
-
-    this.db = nano(this.npmRegistryURL);
   }
 
   async run() {
@@ -56,10 +54,13 @@ export class Fetcher {
   listenChanges() {
     this.app.log.info(`Listening registry changes (lastRegistryUpdateSeq: ${this.app.state.lastRegistryUpdateSeq})`);
 
-    const emitter = this.db.changesReader.start({
+    const db = nano(this.npmRegistryURL);
+
+    const emitter = db.changesReader.start({
       since: this.app.state.lastRegistryUpdateSeq,
       includeDocs: true,
-      wait: true
+      wait: true,
+      batchSize: 10
     });
 
     emitter.on('batch', async (changes) => {
@@ -81,7 +82,7 @@ export class Fetcher {
         }
       }
 
-      this.db.changesReader.resume();
+      db.changesReader.resume();
     });
 
     emitter.on('error', (error) => {
