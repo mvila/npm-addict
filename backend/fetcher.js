@@ -87,10 +87,6 @@ export class Fetcher {
 
     emitter.on('error', (error) => {
       this.app.log.error(error);
-
-      setTimeout(() => {
-        this.listenChanges();
-      }, 60 * 1000); // 1 minute
     });
   }
 
