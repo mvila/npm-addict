@@ -1,13 +1,12 @@
-version: "3"
 networks:
-  public:
+  web:
     external: true
 services:
   npm-addict:
     image: mvila/npm-addict:production
     restart: always
     container_name: npm-addict
-    hostname: host1
+    hostname: host2
     environment:
       - STORE_URL
       - GITHUB_PERSONAL_ACCESS_TOKEN
@@ -21,14 +20,15 @@ services:
       - TWITTER_ACCESS_TOKEN
       - TWITTER_ACCESS_TOKEN_SECRET
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=public
-      - traefik.website.backend=npm-addict-website
-      - traefik.website.frontend.rule=Host:npmaddict.com
-      - traefik.website.port=8832
-      - traefik.api.backend=npm-addict-api
-      - traefik.api.frontend.rule=Host:api.npmaddict.com
-      - traefik.api.port=8831
-      - com.centurylinklabs.watchtower.enable=true
+      - traefik.http.routers.npm-addict-api.rule=Host(`api.npmaddict.com`)
+      - traefik.http.routers.npm-addict-api.tls=true
+      - traefik.http.routers.npm-addict-api.tls.certresolver=lets-encrypt
+      - traefik.http.routers.npm-addict-api.service=npm-addict-api
+      - traefik.http.services.npm-addict-api.loadbalancer.server.port=8831
+      - traefik.http.routers.npm-addict-website.rule=Host(`npmaddict.com`)
+      - traefik.http.routers.npm-addict-website.tls=true
+      - traefik.http.routers.npm-addict-website.tls.certresolver=lets-encrypt
+      - traefik.http.routers.npm-addict-website.service=npm-addict-website
+      - traefik.http.services.npm-addict-website.loadbalancer.server.port=8832
     networks:
-      - public
+      - web
