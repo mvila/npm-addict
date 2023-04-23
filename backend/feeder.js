@@ -49,6 +49,13 @@ export class Feeder {
     const title = `New npm Packages on ${moment.utc(start).format('LL')}`;
 
     let content = '';
+
+    content += '<p>\n';
+    content += `<em><strong>npm addict</strong> will be sunsetting on <strong>May 31st, 2023</strong>. <a href='${this.app.frontendURL}#/sunset'>Find out more</a>.</em>`;
+    content += '</p>\n';
+
+    content += '<hr>\n';
+
     for (const pkg of packages) {
       content += '<p>\n';
       content += `<a href="${pkg.bestURL}">`;

@@ -69,6 +69,8 @@ class Application extends FrontendApplication {
         return 'faq';
       case '#/feeds':
         return 'feeds';
+      case '#/sunset':
+        return 'sunset';
       default:
         return 'packages';
     }

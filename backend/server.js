@@ -63,7 +63,7 @@ export class Server {
 
     router.use(createUAVisitor);
 
-    // curl -v http://api.dev.npmaddict.com:20576/v1/health-check
+    // curl -v http://localhost:8811/v1/health-check
     router.get('/health-check', async function(ctx) {
       let time = Date.now();
       await app.store.BackendState.get('BackendState', { errorIfMissing: false });

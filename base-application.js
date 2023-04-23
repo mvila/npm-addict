@@ -28,8 +28,8 @@ export class BaseApplication extends EventEmitterMixin() {
 
     switch (this.environment) {
       case 'development':
-        this.apiURL = 'http://api.dev.npmaddict.com:20576/v1/';
-        this.frontendURL = 'http://dev.npmaddict.com:20576/';
+        this.apiURL = 'http://localhost:8811/v1/';
+        this.frontendURL = 'http://localhost:8812/';
         break;
       case 'test':
         this.apiURL = 'https://api.test.npmaddict.com/v1/';

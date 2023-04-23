@@ -17,7 +17,7 @@ export class Server {
     root.name = this.app.name;
     root.proxy = true;
 
-    // curl -v http://dev.npmaddict.com:20576/health-check
+    // curl -v http://localhost:8812/health-check
     root.use(async (ctx, next) => {
       if (ctx.url === '/health-check') {
         ctx.body = 'OK';
